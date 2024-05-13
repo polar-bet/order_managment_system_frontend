@@ -1,0 +1,15 @@
+@import '../../variables.scss';
+
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+  height: 100%;
+  width: 100%;
+}
+
+.holder {
+  width: 100%;
+  background-color: $bg-300;
+  padding: 20px;
+}

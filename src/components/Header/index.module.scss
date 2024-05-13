@@ -1,0 +1,106 @@
+@import '../../variables.scss';
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 50px;
+  background-color: $bg-100;
+  z-index: 100;
+
+  &__leftContainer {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+  }
+
+  &__iconLink {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__icon {
+    padding: 3px;
+    background-color: $text-100;
+    max-width: 40px;
+  }
+
+  &__name {
+    color: $text-100;
+    font-weight: 600;
+  }
+
+  &__userAccountLink {
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    transition: 0.3s all ease-in-out;
+
+    &:hover {
+      background-color: $primary-200;
+    }
+  }
+
+  &__user {
+  }
+
+  &__authLink {
+    font-weight: 600;
+    border: 2px solid $text-100;
+    transition: 0.3s all ease-in-out;
+    border-radius: 10px;
+    height: 40px;
+    padding: 10px;
+    text-decoration: none;
+
+    &:hover {
+      background-color: $text-100;
+      color: $bg-100;
+    }
+  }
+
+  &__link {
+    font-weight: 600;
+    position: relative;
+
+    &::after {
+      transition: 0.3s all ease-in-out;
+      content: '';
+      width: 0;
+      height: 2px;
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      background-color: $text-100;
+    }
+
+    &:hover {
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  &__aboutUsLink {
+    font-weight: 600;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: $text-100;
+}
+
+.user {
+  &__icon {
+    font-size: 25px;
+  }
+}

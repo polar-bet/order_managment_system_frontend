@@ -1,0 +1,23 @@
+@import 'scss-reset/reset';
+@import 'variables.scss';
+
+:root {
+  font-family: 'Montserrat', sans-serif;
+  background-color: $bg-200;
+  height: 100%;
+}
+
+main {
+  margin-top: 60px;
+  padding-bottom: 50px;
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $primary-200;
+  border-radius: 4px;
+}

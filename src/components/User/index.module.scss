@@ -1,0 +1,56 @@
+@import '../../variables.scss';
+
+.user {
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+
+  &__image {
+    padding: 10px;
+    border-radius: 50%;
+    background-color: white;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 180px;
+  }
+
+  &__name {
+    font-weight: 600;
+    font-size: 20px;
+    color: $text-100;
+  }
+
+  &__email {
+    display: flex;
+    gap: 10px;
+    color: $text-100;
+  }
+}
+.holder {
+  position: relative;
+}
+
+.logout {
+  padding: 10px;
+  position: absolute;
+  right: -50px;
+  top: 50%;
+  border-radius: 5px;
+  transition: 0.3s all ease-in-out;
+  transform: translateY(-50%);
+
+  &__icon {
+    color: $text-100;
+    font-size: 30px;
+  }
+
+  &:hover {
+    background-color: $accent-100;
+  }
+}

@@ -1,0 +1,33 @@
+@import '../../variables.scss';
+
+.container {
+  height: 100vh;
+  padding: 20px;
+  width: 250px;
+  background-color: $primary-100;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__item {
+  }
+
+  &__link {
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    gap: 10px;
+
+    &:hover {
+      transition: 0.3s all ease-in-out;
+      background-color: $primary-200;
+    }
+  }
+
+  &__link_active {
+    background-color: $primary-200;
+  }
+}

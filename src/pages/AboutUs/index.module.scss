@@ -1,0 +1,47 @@
+@import '../../variables.scss';
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 30px 40px;
+
+}
+
+.holder {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  background-color: $primary-200;
+  height: 100%;
+  padding: 80px 30px;
+  gap: 100px;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: $text-100;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 30px;
+  }
+
+  &__description {
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  &__listItem {
+    list-style: inside;
+  }
+}
