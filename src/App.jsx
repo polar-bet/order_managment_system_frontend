@@ -12,12 +12,15 @@ import ProductTable from './pages/ProductTable'
 import OrderTable from './pages/OrderTable'
 import Dashboard from './pages/Dashboard'
 import AuthUser from './components/AuthUser'
+import ControlPanelLayout from './components/ControlPanelLayout'
+import DetectUserStatus from './components/DetectUserStatus'
 
 function App() {
   return (
     <>
-      <Header />
       <AuthUser />
+      <DetectUserStatus />
+      <Header />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -25,9 +28,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/user-account" element={<UserAccount />} />
-          <Route path="/control-panel/" element={<Dashboard />} />
-          <Route path="/control-panel/product" element={<ProductTable />} />
-          <Route path="/control-panel/order" element={<OrderTable />} />
+          <Route path="/control-panel/*" element={<ControlPanelLayout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

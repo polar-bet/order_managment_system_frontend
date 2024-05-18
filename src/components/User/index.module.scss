@@ -28,8 +28,17 @@
 
   &__email {
     display: flex;
+    align-items: center;
     gap: 10px;
     color: $text-100;
+  }
+}
+
+.email {
+  &__title {
+    display: flex;
+    align-items: center;
+    font-size: 25px;
   }
 }
 .holder {
@@ -37,9 +46,13 @@
 }
 
 .logout {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: $text-100;
   padding: 10px;
   position: absolute;
-  right: -50px;
+  right: -120px;
   top: 50%;
   border-radius: 5px;
   transition: 0.3s all ease-in-out;
@@ -47,7 +60,7 @@
 
   &__icon {
     color: $text-100;
-    font-size: 30px;
+    font-size: 25px;
   }
 
   &:hover {

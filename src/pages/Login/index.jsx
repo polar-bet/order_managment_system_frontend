@@ -28,14 +28,12 @@ function Login() {
       dispatch(authActions.setToken(response.data))
       navigate('/')
     } catch (error) {
-      if (errors.data && errors.data.errors) {
-        let errors = error.response.data.errors
+      let errors = error.response.data.errors
 
-        setErrors({
-          email: errors.email,
-          password: errors.password,
-        })
-      }
+      setErrors({
+        email: errors.email,
+        password: errors.password,
+      })
     }
   }
   return (
@@ -72,8 +70,8 @@ function Login() {
                 </div>
                 {errors.email && (
                   <ul className={styles.form__errorList}>
-                    {errors.email.map(item => (
-                      <li className={styles.form__error}>{item}</li>
+                    {errors.email.map((item, index) => (
+                      <li key={index} className={styles.form__error}>{item}</li>
                     ))}
                   </ul>
                 )}
@@ -91,8 +89,8 @@ function Login() {
                 </div>
                 {errors.password && (
                   <ul className={styles.form__errorList}>
-                    {errors.password.map(item => (
-                      <li className={styles.form__error}>{item}</li>
+                    {errors.password.map((item, index) => (
+                      <li key={index} className={styles.form__error}>{item}</li>
                     ))}
                   </ul>
                 )}

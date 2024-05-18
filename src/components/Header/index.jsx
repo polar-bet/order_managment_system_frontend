@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import styles from './index.module.scss'
+import './index.scss'
 import { useDispatch, useSelector } from 'react-redux'
 import { PersonCircle } from 'react-bootstrap-icons'
 
@@ -9,26 +10,39 @@ function Header() {
 
   return (
     <header className={styles.header}>
-      <div className={styles.header__leftContainer}>
+      <div id="left-container" className={styles.header__leftContainer}>
         <Link to={'/'} className={styles.header__iconLink}>
           <img src="/icon.png" className={styles.header__icon} />
           <span className={styles.header__name}>ORDER WISDOM</span>
         </Link>
-        <Link to={'/about-us'} className={styles.header__link}>
+        <NavLink
+          activeclassname="active"
+          to={'/about-us'}
+          className={styles.header__link}
+        >
           Про нас
-        </Link>
+        </NavLink>
         {user && (
-          <Link to={'/control-panel'} className={styles.header__link}>
+          <NavLink
+            activeclassname="active"
+            to={'/control-panel'}
+            className={styles.header__link}
+          >
             Мої замовлення
-          </Link>
+          </NavLink>
         )}
       </div>
       {/* <Search /> */}
       {user ? (
-        <Link to={'/user-account'} className={styles.header__userAccountLink}>
+        <NavLink
+          id="user-link"
+          activeclassname="active"
+          to={'/user-account'}
+          className={styles.header__userAccountLink}
+        >
           <PersonCircle className={styles.user__icon} />
           <span className={styles.user__name}>{user.name}</span>
-        </Link>
+        </NavLink>
       ) : (
         <Link to={'/login'} className={styles.header__authLink}>
           УВІЙТИ

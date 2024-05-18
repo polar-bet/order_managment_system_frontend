@@ -23,7 +23,7 @@ function AuthUser() {
 
   const getUser = async () => {
     try {
-      let response = await axiosInstance.get('/user', {
+      let response = await axiosInstance.get('/user/current', {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
 

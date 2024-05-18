@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './index.module.scss'
-import { BoxArrowRight, PersonCircle } from 'react-bootstrap-icons'
+import { BoxArrowRight, Envelope, PersonCircle } from 'react-bootstrap-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import axiosInstance from '../../axiosInstance'
 import { authActions } from '../../store/authSlice'
@@ -36,12 +36,15 @@ function User() {
             </div>
             <div className={styles.user__name}>{user.name}</div>
             <div className={styles.user__email}>
-              <div className={styles.email__title}>Email:</div>
+              <div className={styles.email__title}>
+                <Envelope />
+              </div>
               <div className={styles.email__value}>{user.email}</div>
             </div>
           </div>
           <button onClick={logout} className={styles.logout}>
             <BoxArrowRight className={styles.logout__icon} />
+            <span className={styles.logout__text}>вийти</span>
           </button>
         </div>
       )}

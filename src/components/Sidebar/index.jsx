@@ -1,45 +1,49 @@
 import React, { useEffect } from 'react'
+import './index.scss'
 import styles from './index.module.scss'
-import { BarChartLine, Cart2, Truck } from 'react-bootstrap-icons'
-import { Link } from 'react-router-dom'
+import { BarChartLine, Cart2, ChatLeftText, Truck } from 'react-bootstrap-icons'
+import { NavLink } from 'react-router-dom'
 
-function Sidebar({ activeTab }) {
-  useEffect(() => {
-    console.log(activeTab)
-  }, [])
-
+function Sidebar() {
   return (
-    <div className={styles.container}>
+    <div id='sidebar' className={styles.container}>
       <ul className={styles.list}>
         <li className={styles.list__item}>
-          <Link
+          <NavLink
+            end
+            activeclassname="active"
             to={'/control-panel'}
-            className={`${styles.list__link} ${
-              activeTab === 'stats' ? styles.list__link_active : ''
-            }`}
+            className={styles.list__link}
           >
             <BarChartLine /> Статистика
-          </Link>
+          </NavLink>
         </li>
         <li className={styles.list__item}>
-          <Link
+          <NavLink
+            activeclassname="active"
             to={'/control-panel/order'}
-            className={`${styles.list__link} ${
-              activeTab === 'order' ? styles.list__link_active : ''
-            }`}
+            className={styles.list__link}
           >
             <Truck /> Замовлення
-          </Link>
+          </NavLink>
         </li>
         <li className={styles.list__item}>
-          <Link
+          <NavLink
+            activeclassname="active"
             to={'/control-panel/product'}
-            className={`${styles.list__link} ${
-              activeTab === 'product' ? styles.list__link_active : ''
-            }`}
+            className={styles.list__link}
           >
             <Cart2 /> Товари
-          </Link>
+          </NavLink>
+        </li>
+        <li className={styles.list__item}>
+          <NavLink
+            activeclassname="active"
+            to={'/control-panel/chats'}
+            className={styles.list__link}
+          >
+            <ChatLeftText /> Чати
+          </NavLink>
         </li>
       </ul>
     </div>

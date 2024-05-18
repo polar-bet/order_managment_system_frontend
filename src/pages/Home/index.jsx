@@ -2,8 +2,21 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import exampleImage from '../../assets/work_example.png'
 import styles from './index.module.scss'
+import { useEffect } from 'react'
+
+import { useSelector } from 'react-redux'
 
 function Home() {
+  const user = useSelector(state => state.auth.user)
+
+  useEffect(() => {
+    if (user) {
+      window.Echo.private('chat.9').listen('MessageSent', e => {
+        console.log(e)
+      })
+    }
+  }, [])
+
   return (
     <div className={styles.container}>
       <div className={styles.holder}>

@@ -1,0 +1,15 @@
+@import '../../variables.scss';
+
+#left-container {
+  .active {
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+#user-link {
+  &.active {
+    background-color: $primary-200;
+  }
+}
