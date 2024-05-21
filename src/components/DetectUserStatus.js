@@ -4,24 +4,32 @@ import { chatActions } from '../store/chatSlice'
 
 function DetectUserStatus() {
   const chats = useSelector(state => state.chat.chats)
+  const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    window.Echo.join('user-status').here(users => {
-      if (chats) {
-        users.forEach(user => {
-          const chatsWithStatus = chats.map(
-            chat => (chat.status = chat.interlocutor === user.id)
-          )
-          dispatch(chatActions.setChats(chatsWithStatus))
-        })
-      }
-    })
+    if (accessToken) {
+      window.Echo.join('user-status', null, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }).here(users => {
+        if (chats) {
+          users.forEach(user => {
+            const chatsWithStatus = chats.map(
+              chat =>
+                (chat.interlocutor.is_online = chat.interlocutor.id === user.id)
+            )
+            dispatch(chatActions.setChats(chatsWithStatus))
+          })
+        }
+      })
 
-    return () => {
-      window.Echo.leave('user-status')
+      return () => {
+        window.Echo.leave('user-status')
+      }
     }
-  }, [])
+  }, [accessToken])
 }
 
 export default DetectUserStatus

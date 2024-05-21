@@ -11,14 +11,19 @@ function ChatList() {
       {chats.map((chat, index) => (
         <li key={index} className={styles.list__item}>
           <NavLink
+            to={`/control-panel/chats/${chat.id}`}
             id="chat-link"
             activeclassname="active"
             className={styles.list__link}
           >
-            {chat.name}
             <div
-              className={`${styles.status} ${styles.status_online} ${styles.status_offline}`}
+              className={`${styles.status}  ${
+                chat.interlocutor.is_online
+                  ? styles.status_online
+                  : styles.status_offline
+              }`}
             ></div>
+            <span className={styles.link__name}>{chat.interlocutor.name}</span>
           </NavLink>
         </li>
       ))}

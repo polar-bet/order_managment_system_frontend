@@ -21,7 +21,7 @@ function AuthUser() {
     }
   }
 
-  const getUser = async () => {
+  const fetchUser = async () => {
     try {
       let response = await axiosInstance.get('/user/current', {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -41,7 +41,7 @@ function AuthUser() {
 
   useEffect(() => {
     if (accessToken) {
-      getUser()
+      fetchUser()
     }
   }, [accessToken])
 }

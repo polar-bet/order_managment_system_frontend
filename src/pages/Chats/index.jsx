@@ -9,12 +9,14 @@ import { chatActions } from '../../store/chatSlice'
 
 function Chats() {
   const chats = useSelector(state => state.chat.chats)
-  
+  const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
 
   const getChats = async () => {
     try {
-      const response = axiosInstance.get('/chat')
+      const response = await axiosInstance.get('/chat', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
 
       dispatch(chatActions.setChats(response.data))
     } catch (error) {
@@ -24,7 +26,7 @@ function Chats() {
 
   useEffect(() => {
     getChats()
-  }, [])
+  }, [accessToken])
 
   return (
     <div className={styles.container}>
@@ -32,9 +34,9 @@ function Chats() {
         <div className={styles.holder}>
           <ChatList />
           <Routes>
-            <Route path="/{chatId}" element={<Chat />} />
+            <Route index element={<Chat />} />
+            <Route path="/:id" element={<Chat />} />
           </Routes>
-          <Chat />
         </div>
       ) : (
         <div className={styles.message}>Тут відображатимуться ваші чати</div>

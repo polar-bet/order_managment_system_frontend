@@ -15,8 +15,8 @@ function ControlPanelLayout() {
       <div className={styles.holder}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/order" element={<OrderTable />} />
-          <Route path="/product" element={<ProductTable />} />
+          <Route path="/order/*" element={<OrderTable />} />
+          <Route path="/product/*" element={<ProductTable />} />
           <Route path="/chats/*" element={<Chats />} />
         </Routes>
       </div>

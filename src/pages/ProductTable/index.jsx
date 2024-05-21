@@ -19,6 +19,13 @@ import Tooltip from '@mui/material/Tooltip'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { visuallyHidden } from '@mui/utils'
+import { Link, Route, Routes } from 'react-router-dom'
+import ProductForm from '../../components/ProductForm'
+import styles from './index.module.scss'
+import { PlusSquare } from 'react-bootstrap-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { productActions } from '../../store/productSlice'
+import axiosInstance from '../../axiosInstance'
 
 function createData(id, name, category, seller, count, price) {
   return {
@@ -30,8 +37,6 @@ function createData(id, name, category, seller, count, price) {
     price,
   }
 }
-
-const rows = [createData(1, 'Cupcake', '305', 3.7, 67, 4.3)]
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -161,7 +166,7 @@ EnhancedTableHead.propTypes = {
 }
 
 function EnhancedTableToolbar(props) {
-  const { numSelected } = props
+  const { numSelected, onDelete } = props
 
   return (
     <Toolbar
@@ -199,7 +204,7 @@ function EnhancedTableToolbar(props) {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={() => onDelete()}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -216,14 +221,19 @@ function EnhancedTableToolbar(props) {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
 export default function ProductTable() {
   const [order, setOrder] = React.useState('asc')
-  const [orderBy, setOrderBy] = React.useState('calories')
+  const [orderBy, setOrderBy] = React.useState('name')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
+  const [rows, setRows] = React.useState([])
+  const products = useSelector(state => state.product.products)
+  const accessToken = useSelector(state => state.auth.token)
+  const dispatch = useDispatch()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -231,6 +241,34 @@ export default function ProductTable() {
     setOrderBy(property)
   }
 
+  const handleDelete = async () => {
+    try {
+      await axiosInstance.delete('/trader/product', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data: {
+          products: selected,
+        },
+      })
+
+      const updatedRows = rows.filter(row => !selected.includes(row.id))
+      setRows(updatedRows)
+      dispatch(productActions.setProducts(updatedRows))
+      setSelected([])
+
+      const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
+
+      if (page >= totalPages && page > 0) {
+        setPage(page - 1)
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  
   const handleSelectAllClick = event => {
     if (event.target.checked) {
       const newSelected = rows.map(n => n.id)
@@ -270,7 +308,6 @@ export default function ProductTable() {
 
   const isSelected = id => selected.indexOf(id) !== -1
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
 
@@ -280,14 +317,67 @@ export default function ProductTable() {
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage]
+    [order, orderBy, page, rowsPerPage, rows]
   )
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axiosInstance.get('/trader/product', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      const products = response.data.map(product =>
+        createData(
+          product.id,
+          product.name,
+          product.category,
+          product.seller,
+          product.count,
+          product.price
+        )
+      )
+
+      dispatch(productActions.setProducts(products))
+      setRows(products)
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    }
+  }
+
+  React.useEffect(() => {
+    if (accessToken) {
+      fetchProducts()
+    }
+  }, [accessToken])
+
+  React.useEffect(() => {
+    if (products) {
+      setRows(products)
+    }
+  }, [products])
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%' }} className={styles.container}>
+      <div className={styles.panel}>
+        <Link
+          to={'/control-panel/product/create'}
+          className={styles.panel__link}
+        >
+          <PlusSquare className={styles.panel__icon} />
+          <span className={styles.panel__text}>Додати</span>
+        </Link>
+      </div>
+      <Routes>
+        <Route path="/create" element={<ProductForm />} />
+      </Routes>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          onDelete={handleDelete}
+        />
+        <TableContainer className={styles.tableContainer}>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"

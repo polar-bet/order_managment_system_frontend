@@ -4,7 +4,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
-    accessToken: null,
+    accessToken: localStorage.getItem('accessToken'),
     refreshToken: localStorage.getItem('refreshToken'),
   },
   reducers: {
@@ -14,12 +14,14 @@ const authSlice = createSlice({
     setToken(state, action) {
       state.token = action.payload.accessToken
       state.refreshToken = action.payload.refreshToken
+      localStorage.setItem('accessToken', state.token)
       localStorage.setItem('refreshToken', state.refreshToken)
     },
     logout(state) {
       state.user = null
       state.accessToken = null
       state.refreshToken = null
+      localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
     },
   },

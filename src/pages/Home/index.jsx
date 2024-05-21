@@ -30,11 +30,22 @@ function Home() {
               доставки. Покращуйте свої процеси з ORDER WISDOM
             </div>
             <div className={styles.infoContainer__linkContainer}>
-              <Link to={'/auth'} className={styles.infoContainer__link}>
-                <div className={styles.infoContainer__linkText}>
-                  Почніть зараз
-                </div>
-              </Link>
+              {user ? (
+                <Link
+                  to={'/control-panel/order'}
+                  className={styles.infoContainer__link}
+                >
+                  <div className={styles.infoContainer__linkText}>
+                    Перейти до замовлень
+                  </div>
+                </Link>
+              ) : (
+                <Link to={'/auth'} className={styles.infoContainer__link}>
+                  <div className={styles.infoContainer__linkText}>
+                    Почніть зараз
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
           <img
