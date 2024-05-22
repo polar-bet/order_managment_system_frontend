@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ChatList from '../../components/ChatList'
 import Chat from '../../components/Chat'
 import { Route, Routes } from 'react-router-dom'
-import axiosInstance from '../../axiosInstance'
+import axiosInstance from '../../api/axiosInstance'
 import { chatActions } from '../../store/chatSlice'
 
 function Chats() {

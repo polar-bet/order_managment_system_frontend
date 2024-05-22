@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react'
 import Select, { createFilter } from 'react-select'
 import { useSelector, useDispatch } from 'react-redux'
 import { productActions } from '../../store/productSlice'
-import axiosInstance from '../../axiosInstance'
+import axiosInstance from '../../api/axiosInstance'
 import styles from './index.module.scss'
+import PropTypes from 'prop-types'
 import './index.scss'
 
-function CategorySelect({ onChange }) {
+function CategorySelect(props) {
   const [categoryOptions, setCategoryOptions] = useState([])
   const categories = useSelector(state => state.product.categories) || []
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
+  const { onChange, selectedId } = props
 
   const generateGroupOption = category => ({
     value: category.id,
@@ -23,7 +25,6 @@ function CategorySelect({ onChange }) {
       const response = await axiosInstance.get('/category', {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-
       dispatch(productActions.setCategories(response.data))
     } catch (error) {
       console.error(error)
@@ -31,8 +32,10 @@ function CategorySelect({ onChange }) {
   }
 
   useEffect(() => {
-    fetchCategories()
-  }, [])
+    if (accessToken) {
+      fetchCategories()
+    }
+  }, [accessToken])
 
   useEffect(() => {
     if (categories.length > 0) {
@@ -53,6 +56,12 @@ function CategorySelect({ onChange }) {
   return (
     <Select
       name="category"
+      value={
+        selectedId &&
+        categoryOptions.find(
+          categoryOption => categoryOption.value === selectedId
+        )
+      }
       options={categoryOptions}
       onChange={onChange}
       unstyled
@@ -69,6 +78,11 @@ function CategorySelect({ onChange }) {
       classNamePrefix="react-select"
     />
   )
+}
+
+CategorySelect.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  selectedId: PropTypes.number,
 }
 
 export default CategorySelect

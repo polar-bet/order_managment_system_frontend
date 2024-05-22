@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import styles from './index.module.scss'
 import { Link, useNavigate } from 'react-router-dom'
-import axiosInstance from '../../axiosInstance'
+import axiosInstance from '../../api/axiosInstance'
 import { useDispatch } from 'react-redux'
 import { authActions } from '../../store/authSlice'
 
@@ -71,7 +71,9 @@ function Login() {
                 {errors.email && (
                   <ul className={styles.form__errorList}>
                     {errors.email.map((item, index) => (
-                      <li key={index} className={styles.form__error}>{item}</li>
+                      <li key={index} className={styles.form__error}>
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 )}
@@ -90,7 +92,9 @@ function Login() {
                 {errors.password && (
                   <ul className={styles.form__errorList}>
                     {errors.password.map((item, index) => (
-                      <li key={index} className={styles.form__error}>{item}</li>
+                      <li key={index} className={styles.form__error}>
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 )}

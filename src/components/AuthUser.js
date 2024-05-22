@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import axiosInstance from '../axiosInstance'
+import axiosInstance from '../api/axiosInstance'
 import { authActions } from '../store/authSlice'
 import { useEffect } from 'react'
 

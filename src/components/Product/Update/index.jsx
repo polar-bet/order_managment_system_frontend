@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import styles from './index.module.scss'
-import axiosInstance from '../../axiosInstance'
+import axiosInstance from '../../../api/axiosInstance'
 import { useDispatch, useSelector } from 'react-redux'
-import { productActions } from '../../store/productSlice'
+import { productActions } from '../../../store/productSlice'
 import { XLg } from 'react-bootstrap-icons'
-import { Link, useNavigate } from 'react-router-dom'
-import CategorySelect from '../CategorySelect'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import CategorySelect from '../../CategorySelect'
+import { PropTypes } from 'prop-types'
 
-function ProductForm() {
-  const categories = useSelector(state => state.product.categories)
+function UpdateProductForm() {
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
   const [name, setName] = useState(null)
@@ -21,15 +21,29 @@ function ProductForm() {
     count: null,
     price: null,
   })
+
+  const [product, setProduct] = useState(null)
   const navigate = useNavigate()
+  const { id } = useParams()
   const products = useSelector(state => state.product.products)
 
-  const createProduct = async e => {
+  useEffect(() => {
+    if (products) {
+      const productInfo = products.find(product => product.id == id) 
+      setProduct(productInfo)
+      setName(productInfo.name)
+      setCategoryId(productInfo.category.id)
+      setCount(productInfo.count)
+      setPrice(productInfo.price)
+    }
+  }, [id, products])
+
+  const updateProduct = async e => {
     e.preventDefault()
 
     try {
-      const response = await axiosInstance.post(
-        '/trader/product',
+      const response = await axiosInstance.patch(
+        `/trader/product/${product.id}`,
         {
           name: name,
           category_id: categoryId,
@@ -42,7 +56,9 @@ function ProductForm() {
       )
 
       const newProduct = response.data
-      const updatedProducts = [...products, newProduct]
+      const updatedProducts = products.map(p =>
+        p.id === newProduct.id ? newProduct : p
+      )
 
       dispatch(productActions.setProducts(updatedProducts))
 
@@ -59,23 +75,26 @@ function ProductForm() {
   }
 
   const handleSelectClick = selectedOption => {
-    setCategoryId(selectedOption.value)
+    if (selectedOption) {
+      setCategoryId(selectedOption.value)
+    }
   }
 
   return (
     <div className={styles.container}>
-      <form className={styles.form} onSubmit={createProduct}>
+      <form className={styles.form} onSubmit={updateProduct}>
         <div className={styles.upperContainer}>
           <div className={styles.exitButtonHolder}>
             <Link to={'/control-panel/product/'} className={styles.exitButton}>
               <XLg />
             </Link>
           </div>
-          <h1 className={styles.title}>Додати товар</h1>
+          <h1 className={styles.title}>Оновити товар</h1>
         </div>
         <div className={styles.form__group}>
           <div className={styles.form__inputGroup}>
             <input
+              value={name}
               required
               onChange={e => setName(e.target.value)}
               type="text"
@@ -87,7 +106,9 @@ function ProductForm() {
           {errors.name && (
             <ul className={styles.form__errorList}>
               {errors.name.map((item, index) => (
-                <li key={index} className={styles.form__error}>{item}</li>
+                <li key={index} className={styles.form__error}>
+                  {item}
+                </li>
               ))}
             </ul>
           )}
@@ -95,7 +116,7 @@ function ProductForm() {
         <div className={styles.form__group}>
           <CategorySelect
             onChange={handleSelectClick}
-            categories={categories}
+            selectedId={parseInt(categoryId)}
           />
           {errors.categoryId && (
             <ul className={styles.form__errorList}>
@@ -113,6 +134,7 @@ function ProductForm() {
               type="number"
               required
               min={1}
+              value={count}
               placeholder=""
               className={styles.form__input}
               onChange={e => setCount(e.target.value)}
@@ -137,6 +159,7 @@ function ProductForm() {
               min={1.0}
               max={1000000.0}
               step={0.1}
+              value={price}
               placeholder=""
               className={styles.form__input}
               onChange={e => setPrice(e.target.value)}
@@ -154,11 +177,11 @@ function ProductForm() {
           )}
         </div>
         <div className={styles.form__group}>
-          <button className={styles.form__button}>Створити</button>
+          <button className={styles.form__button}>Оновити</button>
         </div>
       </form>
     </div>
   )
 }
 
-export default ProductForm
+export default UpdateProductForm

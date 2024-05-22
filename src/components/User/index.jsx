@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './index.module.scss'
 import { BoxArrowRight, Envelope, PersonCircle } from 'react-bootstrap-icons'
 import { useDispatch, useSelector } from 'react-redux'
-import axiosInstance from '../../axiosInstance'
+import axiosInstance from '../../api/axiosInstance'
 import { authActions } from '../../store/authSlice'
 import { useNavigate } from 'react-router-dom'
 

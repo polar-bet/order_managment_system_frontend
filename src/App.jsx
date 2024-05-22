@@ -45,7 +45,7 @@ function App() {
   return (
     <>
       <AuthUser />
-      <DetectUserStatus />
+      {/* <DetectUserStatus /> */}
       <Header />
       <main>
         <Routes>

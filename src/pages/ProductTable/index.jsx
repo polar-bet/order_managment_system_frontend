@@ -19,13 +19,15 @@ import Tooltip from '@mui/material/Tooltip'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { visuallyHidden } from '@mui/utils'
-import { Link, Route, Routes } from 'react-router-dom'
-import ProductForm from '../../components/ProductForm'
+import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import styles from './index.module.scss'
 import { PlusSquare } from 'react-bootstrap-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { productActions } from '../../store/productSlice'
-import axiosInstance from '../../axiosInstance'
+import axiosInstance from '../../api/axiosInstance'
+import CreateProductForm from '../../components/Product/Create'
+import { Edit } from '@mui/icons-material'
+import UpdateProductForm from '../../components/Product/Update'
 
 function createData(id, name, category, seller, count, price) {
   return {
@@ -100,6 +102,12 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Ціна (грн / шт)',
+  },
+  {
+    id: 'action',
+    numeric: false,
+    disablePadding: false,
+    label: 'дія',
   },
 ]
 
@@ -234,6 +242,7 @@ export default function ProductTable() {
   const products = useSelector(state => state.product.products)
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -262,13 +271,11 @@ export default function ProductTable() {
       if (page >= totalPages && page > 0) {
         setPage(page - 1)
       }
-
     } catch (error) {
       console.log(error)
     }
   }
 
-  
   const handleSelectAllClick = event => {
     if (event.target.checked) {
       const newSelected = rows.map(n => n.id)
@@ -320,6 +327,10 @@ export default function ProductTable() {
     [order, orderBy, page, rowsPerPage, rows]
   )
 
+  const handleEditClick = (e, row) => {
+    navigate(`/control-panel/product/${row.id}`)
+  }
+
   const fetchProducts = async () => {
     try {
       const response = await axiosInstance.get('/trader/product', {
@@ -370,7 +381,8 @@ export default function ProductTable() {
         </Link>
       </div>
       <Routes>
-        <Route path="/create" element={<ProductForm />} />
+        <Route path="/create" element={<CreateProductForm />} />
+        <Route path="/:id" element={<UpdateProductForm />} />
       </Routes>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
@@ -398,17 +410,16 @@ export default function ProductTable() {
 
                 return (
                   <TableRow
-                    hover
-                    onClick={event => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
+                    // role="checkbox"
+                    // aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: 'pointer' }}
-                  >
+                    // selected={isItemSelected}
+                    // sx={{ cursor: 'pointer' }}
+                    >
                     <TableCell padding="checkbox">
                       <Checkbox
+                        onClick={event => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{
@@ -424,10 +435,18 @@ export default function ProductTable() {
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell align="right">{row.category}</TableCell>
+                    <TableCell align="right">{row.category.name}</TableCell>
                     <TableCell align="right">{row.seller}</TableCell>
                     <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        className={styles.action}
+                        onClick={e => handleEditClick(e, row)}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 )
               })}
