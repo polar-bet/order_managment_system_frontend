@@ -9,11 +9,11 @@ import Footer from './components/Footer'
 import UserAccount from './pages/UserAccount'
 import NotFound from './pages/NotFound'
 import AuthUser from './components/AuthUser'
-import ControlPanelLayout from './components/ControlPanelLayout'
 import DetectUserStatus from './components/DetectUserStatus'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { useState } from 'react'
+import ControlPanelLayout from './layouts/ControlPanelLayout'
 
 const ProtectedRoute = ({ element, redirectTo, ...rest }) => {
   const isAuthenticated = localStorage.getItem('accessToken')

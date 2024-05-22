@@ -103,6 +103,12 @@ const headCells = [
     disablePadding: false,
     label: 'Ціна (грн / шт)',
   },
+  {
+    id: 'action',
+    numeric: false,
+    disablePadding: false,
+    label: 'дія',
+  },
 ]
 
 function EnhancedTableHead(props) {
@@ -121,10 +127,8 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell
-        // padding="checkbox"
-        >
-          {/* <Checkbox
+        <TableCell padding="checkbox">
+          <Checkbox
             color="primary"
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
@@ -132,7 +136,7 @@ function EnhancedTableHead(props) {
             inputProps={{
               'aria-label': 'select all desserts',
             }}
-          /> */}
+          />
         </TableCell>
         {headCells.map(headCell => (
           <TableCell
@@ -141,18 +145,24 @@ function EnhancedTableHead(props) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+            {headCell.id !== 'action' ? (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : 'asc'}
+                onClick={createSortHandler(headCell.id)}
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === 'desc'
+                      ? 'sorted descending'
+                      : 'sorted ascending'}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            ) : (
+              headCell.label
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -161,9 +171,9 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  // numSelected: PropTypes.number.isRequired,
+  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  // onSelectAllClick: PropTypes.func.isRequired,
+  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -202,7 +212,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Товари
+          Мої товари
         </Typography>
       )}
 
@@ -224,8 +234,8 @@ function EnhancedTableToolbar(props) {
 }
 
 EnhancedTableToolbar.propTypes = {
-  // numSelected: PropTypes.number.isRequired,
-  // onDelete: PropTypes.func.isRequired,
+  numSelected: PropTypes.number.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
 export default function ProductTable() {
@@ -246,40 +256,40 @@ export default function ProductTable() {
     setOrderBy(property)
   }
 
-  // const handleDelete = async () => {
-  //   try {
-  //     await axiosInstance.delete('/trader/product', {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //       data: {
-  //         products: selected,
-  //       },
-  //     })
+  const handleDelete = async () => {
+    try {
+      await axiosInstance.delete('/trader/product', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data: {
+          products: selected,
+        },
+      })
 
-  //     const updatedRows = rows.filter(row => !selected.includes(row.id))
-  //     setRows(updatedRows)
-  //     dispatch(productActions.setProducts(updatedRows))
-  //     setSelected([])
+      const updatedRows = rows.filter(row => !selected.includes(row.id))
+      setRows(updatedRows)
+      dispatch(productActions.setProducts(updatedRows))
+      setSelected([])
 
-  //     const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
+      const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
 
-  //     if (page >= totalPages && page > 0) {
-  //       setPage(page - 1)
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
+      if (page >= totalPages && page > 0) {
+        setPage(page - 1)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  // const handleSelectAllClick = event => {
-  //   if (event.target.checked) {
-  //     const newSelected = rows.map(n => n.id)
-  //     setSelected(newSelected)
-  //     return
-  //   }
-  //   setSelected([])
-  // }
+  const handleSelectAllClick = event => {
+    if (event.target.checked) {
+      const newSelected = rows.map(n => n.id)
+      setSelected(newSelected)
+      return
+    }
+    setSelected([])
+  }
 
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id)
@@ -323,9 +333,13 @@ export default function ProductTable() {
     [order, orderBy, page, rowsPerPage, rows]
   )
 
+  const handleEditClick = (e, row) => {
+    navigate(`/control-panel/product/${row.id}`)
+  }
+
   const fetchProducts = async () => {
     try {
-      const response = await axiosInstance.get('/product', {
+      const response = await axiosInstance.get('/trader/product', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -362,11 +376,24 @@ export default function ProductTable() {
   }, [products])
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%' }} className={styles.container}>
+      <div className={styles.panel}>
+        <Link
+          to={'/control-panel/product/create'}
+          className={styles.panel__link}
+        >
+          <PlusSquare className={styles.panel__icon} />
+          <span className={styles.panel__text}>Додати</span>
+        </Link>
+      </div>
+      <Routes>
+        <Route path="/create" element={<CreateProductForm />} />
+        <Route path="/:id" element={<UpdateProductForm />} />
+      </Routes>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selected.length}
-          // onDelete={handleDelete}
+          onDelete={handleDelete}
         />
         <TableContainer className={styles.tableContainer}>
           <Table
@@ -378,7 +405,7 @@ export default function ProductTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              // onSelectAllClick={handleSelectAllClick}
+              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -397,14 +424,14 @@ export default function ProductTable() {
                     // sx={{ cursor: 'pointer' }}
                   >
                     <TableCell padding="checkbox">
-                      {/* <Checkbox
+                      <Checkbox
                         onClick={event => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{
                           'aria-labelledby': labelId,
                         }}
-                      /> */}
+                      />
                     </TableCell>
                     <TableCell
                       component="th"
@@ -418,6 +445,14 @@ export default function ProductTable() {
                     <TableCell align="right">{row.seller}</TableCell>
                     <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        className={styles.action}
+                        onClick={e => handleEditClick(e, row)}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 )
               })}

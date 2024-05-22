@@ -29,7 +29,7 @@ function UpdateProductForm() {
 
   useEffect(() => {
     if (products) {
-      const productInfo = products.find(product => product.id == id) 
+      const productInfo = products.find(product => product.id == id)
       setProduct(productInfo)
       setName(productInfo.name)
       setCategoryId(productInfo.category.id)
@@ -62,7 +62,7 @@ function UpdateProductForm() {
 
       dispatch(productActions.setProducts(updatedProducts))
 
-      navigate('/control-panel/product/')
+      navigate('/control-panel/my-product/')
     } catch (error) {
       const errors = error.response.data.errors
       setErrors({

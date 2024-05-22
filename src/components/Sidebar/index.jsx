@@ -39,6 +39,15 @@ function Sidebar() {
         <li className={styles.list__item}>
           <NavLink
             activeclassname="active"
+            to={'/control-panel/my-product'}
+            className={styles.list__link}
+          >
+            <Cart2 /> Мої товари
+          </NavLink>
+        </li>
+        <li className={styles.list__item}>
+          <NavLink
+            activeclassname="active"
             to={'/control-panel/chats'}
             className={styles.list__link}
           >

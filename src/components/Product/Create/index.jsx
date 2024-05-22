@@ -46,7 +46,7 @@ function CreateProductForm() {
 
       dispatch(productActions.setProducts(updatedProducts))
 
-      navigate('/control-panel/product/')
+      navigate('/control-panel/my-product/')
     } catch (error) {
       const errors = error.response.data.errors
       setErrors({
