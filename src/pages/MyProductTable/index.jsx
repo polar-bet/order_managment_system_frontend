@@ -161,7 +161,7 @@ function EnhancedTableHead(props) {
                 ) : null}
               </TableSortLabel>
             ) : (
-              headCell.label
+            headCell.label
             )}
           </TableCell>
         ))}
@@ -334,7 +334,7 @@ export default function ProductTable() {
   )
 
   const handleEditClick = (e, row) => {
-    navigate(`/control-panel/product/${row.id}`)
+    navigate(`/control-panel/my-product/${row.id}`)
   }
 
   const fetchProducts = async () => {
@@ -379,7 +379,7 @@ export default function ProductTable() {
     <Box sx={{ width: '100%' }} className={styles.container}>
       <div className={styles.panel}>
         <Link
-          to={'/control-panel/product/create'}
+          to={'/control-panel/my-product/create'}
           className={styles.panel__link}
         >
           <PlusSquare className={styles.panel__icon} />

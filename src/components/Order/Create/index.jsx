@@ -1,33 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styles from './index.module.scss'
 import axiosInstance from '../../../api/axiosInstance'
 import { useDispatch, useSelector } from 'react-redux'
-import { productActions } from '../../../store/productSlice'
 import { XLg } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
-import CategorySelect from '../../CategorySelect'
+import LocationPicker from '../../LocationPicker'
+import ProductSelect from '../../ProductSelect'
+import { orderActions } from '../../../store/orderSlice'
 
-function CreateProductForm() {
-  const categories = useSelector(state => state.product.categories)
+function CreateOrderForm() {
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
-  const [name, setName] = useState(null)
-  const [categoryId, setCategoryId] = useState(null)
+  const [productId, setProductId] = useState(null)
   const [count, setCount] = useState(null)
-  const [price, setPrice] = useState(null)
+  const [destination, setDestination] = useState(null)
   const [errors, setErrors] = useState({
-    name: null,
-    categoryId: null,
+    productId: null,
     count: null,
-    price: null,
+    destination: null,
   })
   const navigate = useNavigate()
-  const products = useSelector(state => state.product.products)
+  const orders = useSelector(state => state.order.orders)
 
   const handleExit = e => {
     e.preventDefault()
-
-    navigate('/control-panel/my-product/')
+    navigate('/control-panel/order')
   }
 
   const createProduct = async e => {
@@ -35,37 +32,38 @@ function CreateProductForm() {
 
     try {
       const response = await axiosInstance.post(
-        '/trader/product',
+        '/order',
         {
-          name: name,
-          category_id: categoryId,
+          product_id: productId,
           count: count,
-          price: price,
+          destination: destination,
         },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       )
 
-      const newProduct = response.data
-      const updatedProducts = [...products, newProduct]
+      const newOrder = response.data
+      const updatedOrders = [...orders, newOrder]
 
-      dispatch(productActions.setProducts(updatedProducts))
-
-      navigate('/control-panel/my-product/')
+      dispatch(orderActions.setOrders(updatedOrders))
+      navigate('/control-panel/order')
     } catch (error) {
       const errors = error.response.data.errors
       setErrors({
-        name: errors.name,
-        categoryId: errors.category_id,
+        productId: errors.product_id,
         count: errors.count,
-        price: errors.price,
+        destination: errors.destination,
       })
     }
   }
 
   const handleSelectClick = selectedOption => {
-    setCategoryId(selectedOption.value)
+    setProductId(selectedOption.value)
+  }
+
+  const handleLocationSelect = location => {
+    setDestination(`${location.lat},${location.lng}`)
   }
 
   return (
@@ -77,34 +75,13 @@ function CreateProductForm() {
               <XLg />
             </button>
           </div>
-          <h1 className={styles.title}>Створити товар</h1>
+          <h1 className={styles.title}>Створити замовлення</h1>
         </div>
         <div className={styles.form__group}>
-          <div className={styles.form__inputGroup}>
-            <input
-              required
-              onChange={e => setName(e.target.value)}
-              type="text"
-              placeholder=""
-              className={styles.form__input}
-            />
-            <label className={styles.form__label}>Назва</label>
-          </div>
-          {errors.name && (
+          <ProductSelect onChange={handleSelectClick} />
+          {errors.productId && (
             <ul className={styles.form__errorList}>
-              {errors.name.map((item, index) => (
-                <li key={index} className={styles.form__error}>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <div className={styles.form__group}>
-          <CategorySelect onChange={handleSelectClick} />
-          {errors.categoryId && (
-            <ul className={styles.form__errorList}>
-              {errors.categoryId.map((item, index) => (
+              {errors.productId.map((item, index) => (
                 <li key={index} className={styles.form__error}>
                   {item}
                 </li>
@@ -134,23 +111,17 @@ function CreateProductForm() {
             </ul>
           )}
         </div>
+
         <div className={styles.form__group}>
           <div className={styles.form__inputGroup}>
-            <input
-              type="number"
-              required
-              min={1.0}
-              max={1000000.0}
-              step={0.1}
-              placeholder=""
-              className={styles.form__input}
-              onChange={e => setPrice(e.target.value)}
-            />
-            <label className={styles.form__label}>Ціна</label>
+            <label className={styles.form__labelStatic}>
+              Пункт призначення
+            </label>
+            <LocationPicker onLocationSelect={handleLocationSelect} />
           </div>
-          {errors.price && (
+          {errors.destination && (
             <ul className={styles.form__errorList}>
-              {errors.price.map((item, index) => (
+              {errors.destination.map((item, index) => (
                 <li key={index} className={styles.form__error}>
                   {item}
                 </li>
@@ -166,4 +137,4 @@ function CreateProductForm() {
   )
 }
 
-export default CreateProductForm
+export default CreateOrderForm

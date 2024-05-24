@@ -6,7 +6,7 @@
   position: absolute;
   background-color: rgba($color: #000000, $alpha: 0.5);
   display: flex;
-  align-items: center;
+  padding-top: 30px;
   justify-content: center;
   width: 100%;
   height: 100%;
@@ -20,6 +20,8 @@
 }
 
 .form {
+  overflow-y: scroll;
+  max-height: 500px;
   padding: 20px;
   width: 500px;
   background-color: $bg-300;
@@ -80,6 +82,9 @@
   }
 
   &__inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     width: 100%;
     position: relative;
   }
@@ -100,6 +105,11 @@
     transform: translateY(0);
     color: $text-100;
   }
+
+  &__labelStatic {
+    color: $text-100;
+    font-weight: 500;
+  }
 }
 
 .exitButtonHolder {
@@ -108,13 +118,14 @@
 }
 
 .exitButton {
-  color: $text-100;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 5px;
   transition: 0.2s all ease-in-out;
   border-radius: 50%;
+  color: $text-100;
+
   &:hover {
     background-color: $primary-100;
   }

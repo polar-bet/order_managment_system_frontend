@@ -19,20 +19,29 @@ import Tooltip from '@mui/material/Tooltip'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { visuallyHidden } from '@mui/utils'
+import { Link, Route, Routes, useNavigate } from 'react-router-dom'
+import styles from './index.module.scss'
+import { PlusSquare } from 'react-bootstrap-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { productActions } from '../../store/productSlice'
+import axiosInstance from '../../api/axiosInstance'
+import CreateProductForm from '../../components/Product/Create'
+import { Edit } from '@mui/icons-material'
+import UpdateProductForm from '../../components/Product/Update'
+import { orderActions } from '../../store/orderSlice'
+import CreateOrderForm from '../../components/Order/Create'
+import UpdateOrderForm from '../../components/Order/Update'
 
-function createData(id, name, customer, destination, count, price, status) {
+function createData(id, status, product, destination, count, price) {
   return {
     id,
-    name,
-    customer,
+    product,
+    status,
     destination,
     count,
     price,
-    status,
   }
 }
-
-const rows = [createData(1, 'Cupcake', '305', 3.7, 67, 4.3, 'РОЗГЛЯД')]
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -50,10 +59,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy)
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index])
   stabilizedThis.sort((a, b) => {
@@ -68,16 +73,16 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: 'name',
+    id: 'product',
     numeric: false,
     disablePadding: true,
-    label: 'Назва',
+    label: 'Назва товару',
   },
   {
-    id: 'customer',
+    id: 'status',
     numeric: false,
     disablePadding: false,
-    label: 'Замовник',
+    label: 'Статус',
   },
   {
     id: 'destination',
@@ -98,10 +103,10 @@ const headCells = [
     label: 'Сума (грн)',
   },
   {
-    id: 'status',
-    numeric: true,
+    id: 'action',
+    numeric: false,
     disablePadding: false,
-    label: 'Статус',
+    label: 'дія',
   },
 ]
 
@@ -139,18 +144,24 @@ function EnhancedTableHead(props) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+            {headCell.id !== 'action' ? (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : 'asc'}
+                onClick={createSortHandler(headCell.id)}
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === 'desc'
+                      ? 'sorted descending'
+                      : 'sorted ascending'}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            ) : (
+              headCell.label
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -168,7 +179,7 @@ EnhancedTableHead.propTypes = {
 }
 
 function EnhancedTableToolbar(props) {
-  const { numSelected } = props
+  const { numSelected, onDelete } = props
 
   return (
     <Toolbar
@@ -200,13 +211,13 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Замовлення
+          Мої замовлення
         </Typography>
       )}
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={() => onDelete()}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -223,19 +234,51 @@ function EnhancedTableToolbar(props) {
 
 EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
-export default function ProductTable() {
+export default function OrderTable() {
   const [order, setOrder] = React.useState('asc')
-  const [orderBy, setOrderBy] = React.useState('calories')
+  const [orderBy, setOrderBy] = React.useState('name')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
+  const [rows, setRows] = React.useState([])
+  const orders = useSelector(state => state.order.orders)
+  const accessToken = useSelector(state => state.auth.token)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
+  }
+
+  const handleDelete = async () => {
+    try {
+      await axiosInstance.delete('/order', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data: {
+          orders: selected,
+        },
+      })
+
+      const updatedRows = rows.filter(row => !selected.includes(row.id))
+      setRows(updatedRows)
+      dispatch(orderActions.setOrders(updatedRows))
+      setSelected([])
+
+      const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
+
+      if (page >= totalPages && page > 0) {
+        setPage(page - 1)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const handleSelectAllClick = event => {
@@ -277,7 +320,6 @@ export default function ProductTable() {
 
   const isSelected = id => selected.indexOf(id) !== -1
 
-  // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
 
@@ -287,14 +329,69 @@ export default function ProductTable() {
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage]
+    [order, orderBy, page, rowsPerPage, rows]
   )
 
+  const handleEditClick = (e, row) => {
+    navigate(`/control-panel/order/${row.id}`)
+  }
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axiosInstance.get('order', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      const orders = response.data.map(order =>
+        createData(
+          order.id,
+          order.status,
+          order.product,
+          order.destination,
+          order.count,
+          order.price
+        )
+      )
+
+      dispatch(orderActions.setOrders(orders))
+      setRows(orders)
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    }
+  }
+
+  React.useEffect(() => {
+    if (accessToken) {
+      fetchOrders()
+    }
+  }, [accessToken])
+
+  React.useEffect(() => {
+    if (orders) {
+      setRows(orders)
+    }
+  }, [orders])
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%' }} className={styles.container}>
+      <div className={styles.panel}>
+        <Link to={'/control-panel/order/create'} className={styles.panel__link}>
+          <PlusSquare className={styles.panel__icon} />
+          <span className={styles.panel__text}>Створити замовлення</span>
+        </Link>
+      </div>
+      <Routes>
+        <Route path="/create" element={<CreateOrderForm />} />
+        <Route path="/:id" element={<UpdateOrderForm />} />
+      </Routes>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          onDelete={handleDelete}
+        />
+        <TableContainer className={styles.tableContainer}>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -315,8 +412,6 @@ export default function ProductTable() {
 
                 return (
                   <TableRow
-                    hover
-                    onClick={event => handleClick(event, row.id)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -326,6 +421,7 @@ export default function ProductTable() {
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
+                        onClick={event => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{
@@ -339,13 +435,20 @@ export default function ProductTable() {
                       scope="row"
                       padding="none"
                     >
-                      {row.name}
+                      {row.product.name}
                     </TableCell>
-                    <TableCell align="right">{row.customer}</TableCell>
-                    <TableCell align="right">{row.destination}</TableCell>
+                    <TableCell align="right">{row.status}</TableCell>
+                    <TableCell align="right">{`${row.destination.lat},${row.destination.lng}`}</TableCell>
                     <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
-                    <TableCell align="right">{row.status}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        className={styles.action}
+                        onClick={e => handleEditClick(e, row)}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 )
               })}

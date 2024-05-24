@@ -90,3 +90,33 @@
     text-align: center;
   }
 }
+
+@media (max-width: 1000px) {
+  .infoContainer {
+    
+    &__image {
+      width: 50%;
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  .container {
+    padding: 20px 10px;
+  }
+
+  .infoContainer {
+    
+    &__image {
+      display: none;
+    }
+
+    &__title {
+      text-align: justify;
+    }
+    &__description {
+      text-align: justify;
+    }
+    
+  }
+}

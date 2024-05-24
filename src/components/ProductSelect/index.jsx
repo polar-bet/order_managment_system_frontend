@@ -7,25 +7,25 @@ import styles from './index.module.scss'
 import PropTypes from 'prop-types'
 import './index.scss'
 
-function CategorySelect(props) {
-  const [categoryOptions, setCategoryOptions] = useState([])
-  const categories = useSelector(state => state.product.categories) || []
+function ProductSelect(props) {
+  const [productOptions, setProductOptions] = useState([])
+  const products = useSelector(state => state.product.products) || []
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
   const { onChange, selectedId } = props
 
-  const generateGroupOption = category => ({
-    value: category.id,
-    label: category.name,
-    data: category,
+  const generateGroupOption = product => ({
+    value: product.id,
+    label: product.name,
+    data: product,
   })
 
-  const fetchCategories = async () => {
+  const fetchProducts = async () => {
     try {
-      const response = await axiosInstance.get('/category', {
+      const response = await axiosInstance.get('/product', {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-      dispatch(productActions.setCategories(response.data))
+      dispatch(productActions.setProducts(response.data))
     } catch (error) {
       console.error(error)
     }
@@ -33,17 +33,15 @@ function CategorySelect(props) {
 
   useEffect(() => {
     if (accessToken) {
-      fetchCategories()
+      fetchProducts()
     }
   }, [accessToken])
 
   useEffect(() => {
-    if (categories.length > 0) {
-      setCategoryOptions(
-        categories.map(category => generateGroupOption(category))
-      )
+    if (products.length > 0) {
+      setProductOptions(products.map(product => generateGroupOption(product)))
     }
-  }, [categories])
+  }, [products])
 
   const formatOptionLabel = ({ label, data }) => (
     <div className={styles.option__category}>
@@ -56,14 +54,11 @@ function CategorySelect(props) {
   return (
     <Select
       required
-      name="category"
-      value={
-        selectedId &&
-        categoryOptions.find(
-          categoryOption => categoryOption.value === selectedId
-        )
-      }
-      options={categoryOptions}
+      name="product"
+      value={selectedId && productOptions.find(
+        productOption => productOption.value === selectedId
+      )}
+      options={productOptions}
       onChange={onChange}
       unstyled
       formatOptionLabel={formatOptionLabel}
@@ -73,17 +68,18 @@ function CategorySelect(props) {
       })}
       isClearable
       isSearchable
-      noOptionsMessage={() => 'Категорії не знайдено'}
-      placeholder="Оберіть категорію"
+      maxMenuHeight={'150px'}
+      noOptionsMessage={() => 'Товари не знайдено'}
+      placeholder="Оберіть товар"
       className="react-select-container"
       classNamePrefix="react-select"
     />
   )
 }
 
-CategorySelect.propTypes = {
+ProductSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
   selectedId: PropTypes.number,
 }
 
-export default CategorySelect
+export default ProductSelect

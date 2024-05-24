@@ -80,16 +80,22 @@ function UpdateProductForm() {
     }
   }
 
+  const handleExit = e => {
+    e.preventDefault()
+
+    navigate('/control-panel/my-product/')
+  }
+
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={updateProduct}>
         <div className={styles.upperContainer}>
           <div className={styles.exitButtonHolder}>
-            <Link to={'/control-panel/product/'} className={styles.exitButton}>
+            <button onClick={handleExit} className={styles.exitButton}>
               <XLg />
-            </Link>
+            </button>
           </div>
-          <h1 className={styles.title}>Оновити товар</h1>
+          <h1 className={styles.title}>Змінити товар</h1>
         </div>
         <div className={styles.form__group}>
           <div className={styles.form__inputGroup}>
@@ -177,7 +183,7 @@ function UpdateProductForm() {
           )}
         </div>
         <div className={styles.form__group}>
-          <button className={styles.form__button}>Оновити</button>
+          <button className={styles.form__button}>Змінити</button>
         </div>
       </form>
     </div>

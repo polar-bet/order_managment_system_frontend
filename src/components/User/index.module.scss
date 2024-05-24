@@ -1,6 +1,7 @@
 @import '../../variables.scss';
 
 .user {
+
   &__container {
     display: flex;
     flex-direction: column;
@@ -41,22 +42,31 @@
     font-size: 25px;
   }
 }
+
+
 .holder {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.button {
+  height: 40px;
+  border: 2px solid $text-100;
+  width: 290px;
+  display: flex;
+  gap: 5px;
+  padding: 10px;
+  border-radius: 5px;
+  color: $text-100;
+  transition: 0.3s all ease-in-out;
+  align-items: center;
+
+  &__icon {
+  }
 }
 
 .logout {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  color: $text-100;
-  padding: 10px;
-  position: absolute;
-  right: -120px;
-  top: 50%;
-  border-radius: 5px;
-  transition: 0.3s all ease-in-out;
-  transform: translateY(-50%);
 
   &__icon {
     color: $text-100;
@@ -65,5 +75,23 @@
 
   &:hover {
     background-color: $accent-100;
+  }
+}
+
+.changeAccount {
+  &:hover {
+    background-color: $primary-200;
+  }
+}
+
+.actionList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+
+  &__item {
+    width: 100%;
   }
 }

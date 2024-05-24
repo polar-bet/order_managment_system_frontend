@@ -2,60 +2,38 @@
 
 .container {
   display: flex;
-  gap: 20px;
-  padding: 10px;
-  height: 100%;
-  width: 100%;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.holder {
-  width: 100%;
-  background-color: $bg-300;
-  padding: 20px;
-  overflow: auto;
+.tableRowContainer {
+  display: flex;
 }
 
-.table {
+
+.panel {
   width: 100%;
-  color: $text-100;
-  min-width: 500px;
+  height: 40px;
+  display: flex;
+  justify-content: end;
 
-  &__head {
-  }
-
-  &__data {
-    padding: 5px;
-    border: 1px solid $text-100;
-  }
-
-  &__row {
-    display: grid;
-  }
-
-  &__body {
-    display: grid;
-    margin-top: 10px;
-  }
-
-  &__empty {
-    display: flex;
-    justify-content: center;
-    background-color: $primary-200;
-  }
-}
-
-.head {
-  &__data {
+  &__link {
+    background-color: $primary-100;
+    width: 250px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    border: 1px solid $text-100;
+    color: $text-100;
+    gap: 5px;
+    border-radius: 5px;
+    transition: 0.2s all ease-in-out;
+    &:hover {
+      background-color: $bg-200;
+    }
   }
+}
 
-  &__row {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    background-color: $primary-200;
-  }
+.tableContainer {
+  max-height: 350px;
 }
