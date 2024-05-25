@@ -4,9 +4,10 @@ import axiosInstance from '../../../api/axiosInstance'
 import { useDispatch, useSelector } from 'react-redux'
 import { XLg } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
-import LocationPicker from '../../LocationPicker'
-import ProductSelect from '../../ProductSelect'
+import LocationPicker from '../LocationPicker'
+import ProductSelect from '../ProductSelect'
 import { orderActions } from '../../../store/orderSlice'
+import { toast } from 'react-toastify'
 
 function CreateOrderForm() {
   const accessToken = useSelector(state => state.auth.token)
@@ -47,6 +48,9 @@ function CreateOrderForm() {
       const updatedOrders = [...orders, newOrder]
 
       dispatch(orderActions.setOrders(updatedOrders))
+
+      toast.success('Замовлення створено')
+
       navigate('/control-panel/order')
     } catch (error) {
       const errors = error.response.data.errors

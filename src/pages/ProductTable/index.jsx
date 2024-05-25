@@ -28,6 +28,7 @@ import axiosInstance from '../../api/axiosInstance'
 import CreateProductForm from '../../components/Product/Create'
 import { Edit } from '@mui/icons-material'
 import UpdateProductForm from '../../components/Product/Update'
+import { ToastContainer } from 'react-toastify'
 
 function createData(id, name, category, seller, count, price) {
   return {
@@ -443,6 +444,13 @@ export default function ProductTable() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={2500}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+      />
     </Box>
   )
 }

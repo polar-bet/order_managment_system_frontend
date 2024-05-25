@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { productActions } from '../../../store/productSlice'
 import { XLg } from 'react-bootstrap-icons'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import CategorySelect from '../../CategorySelect'
+import CategorySelect from '../CategorySelect'
 import { PropTypes } from 'prop-types'
+import { toast } from 'react-toastify'
 
 function UpdateProductForm() {
   const accessToken = useSelector(state => state.auth.token)
@@ -61,6 +62,8 @@ function UpdateProductForm() {
       )
 
       dispatch(productActions.setProducts(updatedProducts))
+
+      toast.success('Товар змінено')
 
       navigate('/control-panel/my-product/')
     } catch (error) {

@@ -31,6 +31,7 @@ import UpdateProductForm from '../../components/Product/Update'
 import { orderActions } from '../../store/orderSlice'
 import CreateOrderForm from '../../components/Order/Create'
 import UpdateOrderForm from '../../components/Order/Update'
+import { ToastContainer, toast } from 'react-toastify'
 
 function createData(id, status, product, destination, count, price) {
   return {
@@ -276,6 +277,8 @@ export default function OrderTable() {
       if (page >= totalPages && page > 0) {
         setPage(page - 1)
       }
+
+      toast.success('Товар видалено успішно')
     } catch (error) {
       console.log(error)
     }
@@ -474,6 +477,13 @@ export default function OrderTable() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={2500}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+      />
     </Box>
   )
 }

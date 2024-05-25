@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import axiosInstance from '../../api/axiosInstance'
 import { authActions } from '../../store/authSlice'
 import { useNavigate } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 
 function User() {
   const user = useSelector(state => state.auth.user)
@@ -86,6 +87,13 @@ function User() {
           </ul>
         </div>
       )}
+      <ToastContainer
+        position="bottom-center"
+        autoClose={2500}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+      />
     </div>
   )
 }

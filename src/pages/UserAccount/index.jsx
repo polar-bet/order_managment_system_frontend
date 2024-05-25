@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './index.module.scss'
 import User from '../../components/User'
 import { BoxArrowRight } from 'react-bootstrap-icons'
+import { ToastContainer } from 'react-toastify'
 
 function UserAccount() {
   return (

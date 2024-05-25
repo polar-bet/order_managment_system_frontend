@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { productActions } from '../../../store/productSlice'
 import { XLg } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
-import CategorySelect from '../../CategorySelect'
+import CategorySelect from '../CategorySelect'
+import { ToastContainer, toast } from 'react-toastify'
 
 function CreateProductForm() {
   const categories = useSelector(state => state.product.categories)
@@ -51,6 +52,8 @@ function CreateProductForm() {
       const updatedProducts = [...products, newProduct]
 
       dispatch(productActions.setProducts(updatedProducts))
+
+      toast.success('Товар додано')
 
       navigate('/control-panel/my-product/')
     } catch (error) {
@@ -162,6 +165,7 @@ function CreateProductForm() {
           <button className={styles.form__button}>Створити</button>
         </div>
       </form>
+
     </div>
   )
 }

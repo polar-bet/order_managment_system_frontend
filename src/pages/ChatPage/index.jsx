@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import styles from './index.module.scss'
 import { useDispatch, useSelector } from 'react-redux'
-import ChatList from '../../components/ChatList'
-import Chat from '../../components/Chat'
+import ChatList from '../../components/ChatPage/ChatList'
+import Chat from '../../components/ChatPage/Chat'
 import { Route, Routes } from 'react-router-dom'
 import axiosInstance from '../../api/axiosInstance'
 import { chatActions } from '../../store/chatSlice'
 
-function Chats() {
+function ChatPage() {
   const chats = useSelector(state => state.chat.chats)
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
@@ -45,4 +45,4 @@ function Chats() {
   )
 }
 
-export default Chats
+export default ChatPage

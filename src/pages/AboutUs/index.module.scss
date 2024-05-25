@@ -6,7 +6,6 @@
   justify-content: center;
   height: 100%;
   padding: 30px 40px;
-
 }
 
 .holder {
@@ -43,5 +42,32 @@
   }
   &__listItem {
     list-style: inside;
+  }
+}
+
+@media (max-width: 450px) {
+  .container {
+    padding: 30px 10px;
+  }
+
+  .holder {
+    padding: 80px 20px;
+  }
+
+  .infoContainer {
+    &__title {
+      font-size: 15px;
+    }
+    &__description {
+      font-size: 12px;
+      text-align: justify;
+    }
+  }
+
+  .questionContainer {
+    &__title,
+    &__description {
+      text-align: justify;
+    }
   }
 }

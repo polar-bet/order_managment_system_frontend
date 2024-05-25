@@ -7,185 +7,217 @@
   width: 100%;
   height: 600px;
   padding: 20px 0;
+}
 
-  .placeholder {
+.placeholder {
+  padding: 10px;
+  display: flex;
+  transition: all 1s ease-in-out;
+  display: flex;
+  width: 50%;
+  height: 100%;
+  background-image: url('../../assets/bg.webp');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  &__content {
+    opacity: 1; /* Додали початкову прозорість */
     display: flex;
-    transition: all 1s ease-in-out;
-    display: flex;
-    width: 50%;
-    height: 100%;
-    background-image: url('../../assets/bg.webp');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-
-    &__content {
-      opacity: 1; /* Додали початкову прозорість */
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      justify-content: center;
-      animation: fade 1s;
-      color: $text-100;
-      gap: 20px;
-      width: 100%;
-    }
-
-    &__buttonContainer {
-      background-color: $text-100;
-      border-radius: 5px;
-    }
-
-    &__text {
-      font-size: 20px;
-      max-width: 300px;
-      text-align: justify;
-    }
-
-    &__button {
-      border-radius: 5px;
-      letter-spacing: 1px;
-      transition: 0.3s all ease-in-out;
-      background-color: $bg-200;
-      padding: 10px;
-      border: 2px solid $text-100;
-      color: $text-100;
-      transform: translate(-5px, -5px);
-
-      &:hover {
-        transform: translate(0, 0);
-      }
-    }
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    animation: fade 1s;
+    color: $text-100;
+    gap: 20px;
+    width: 100%;
   }
 
-  .holder {
-    max-width: 800px;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: $bg-300;
+  &__buttonContainer {
+    background-color: $text-100;
+    border-radius: 5px;
+  }
+
+  &__text {
+    font-size: 20px;
+    max-width: 300px;
+    text-align: justify;
+  }
+
+  &__button {
+    border-radius: 5px;
+    letter-spacing: 1px;
+    transition: 0.3s all ease-in-out;
+    background-color: $bg-200;
+    padding: 10px;
+    border: 2px solid $text-100;
+    color: $text-100;
+    transform: translate(-5px, -5px);
+
+    &:hover {
+      transform: translate(0, 0);
+    }
+  }
+}
+
+.holder {
+  max-width: 800px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: $bg-300;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.formHolder {
+  padding-top: 15px;
+  width: 50%;
+  overflow: hidden;
+}
+
+.formContainer {
+  animation: scrollIn 1s;
+  padding: 10px;
+  width: 100%;
+  display: flex;
+}
+
+.container_active {
+  display: flex;
+}
+
+.form {
+  color: $bg-100;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
+  &__title {
+    font-weight: 600;
+    color: $text-100;
+    font-size: 30px;
+  }
+
+  &__label {
+    font-weight: 500;
+    pointer-events: none;
+    transition: 0.3s all ease-in-out;
+    position: absolute;
+    user-select: none;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &__group {
+    position: relative;
     display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__inputGroup {
     width: 100%;
-    height: 100%;
+    position: relative;
+  }
+
+  &__input {
+    border: none;
+    width: 100%;
+    padding-left: 5px;
+    background-color: $text-100;
+    height: 40px;
+  }
+
+  &__buttonContainer {
+    display: flex;
+    justify-content: center;
     align-items: center;
   }
 
-  .formHolder {
-    padding-top: 15px;
-    width: 50%;
-    overflow: hidden;
+  &__buttonHolder {
+    background-color: $text-100;
+    border-radius: 5px;
   }
 
-  .formContainer {
-    animation: scrollIn 1s;
+  &__button {
+    border-radius: 5px;
+    letter-spacing: 1px;
+    transition: 0.3s all ease-in-out;
+    background-color: $bg-200;
     padding: 10px;
+    border: 2px solid $text-100;
+    color: $text-100;
+    transform: translate(-5px, -5px);
+
+    &:hover {
+      transform: translate(0, 0);
+    }
+  }
+
+  &__error {
+    color: $accent-100;
+    font-size: 12px;
+  }
+
+  .form__input:not(:placeholder-shown) ~ .form__label,
+  .form__input:focus ~ .form__label {
+    left: 0;
+    top: -25px;
+    font-size: 14px;
+    transform: translateY(0);
+    color: $text-100;
+  }
+}
+
+@media (max-width: 820px) {
+  .holder {
+    padding-top: 25px;
+    flex-direction: column-reverse;
+    height: unset;
+  }
+
+  .placeholder {
+    height: 300px;
     width: 100%;
-    display: flex;
   }
+}
 
-  .container_active {
-    display: flex;
-  }
-
+@media (max-width: 600px) {
   .form {
-    color: $bg-100;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-
-    &__title {
-      font-weight: 600;
-      color: $text-100;
-      font-size: 30px;
-    }
-
-    &__label {
-      font-weight: 500;
-      pointer-events: none;
-      transition: 0.3s all ease-in-out;
-      position: absolute;
-      user-select: none;
-      left: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
     &__group {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+      width: 100%;
     }
-
     &__inputGroup {
       width: 100%;
-      position: relative;
-    }
-
-    &__input {
-      border: none;
-      width: 100%;
-      padding-left: 5px;
-      background-color: $text-100;
-      height: 40px;
-    }
-
-    &__buttonContainer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    &__buttonHolder {
-      background-color: $text-100;
-      border-radius: 5px;
-    }
-
-    &__button {
-      border-radius: 5px;
-      letter-spacing: 1px;
-      transition: 0.3s all ease-in-out;
-      background-color: $bg-200;
-      padding: 10px;
-      border: 2px solid $text-100;
-      color: $text-100;
-      transform: translate(-5px, -5px);
-
-      &:hover {
-        transform: translate(0, 0);
-      }
-    }
-
-    &__error {
-      color: $accent-100;
-      font-size: 12px;
-    }
-
-    .form__input:not(:placeholder-shown) ~ .form__label,
-    .form__input:focus ~ .form__label {
-      left: 0;
-      top: -25px;
-      font-size: 14px;
-      transform: translateY(0);
-      color: $text-100;
     }
   }
-
-  @keyframes fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  .formHolder {
+    width: 100% !important;
   }
+  .formContainer {
+    width: 100%;
+  }
+}
 
-  @keyframes scrollIn {
-    from {
-      transform: translateY(-200px);
-    }
-    to {
-      transform: translateY(0);
-    }
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scrollIn {
+  from {
+    transform: translateY(-200px);
+  }
+  to {
+    transform: translateY(0);
   }
 }

@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { XLg } from 'react-bootstrap-icons'
 import { useNavigate, useParams } from 'react-router-dom'
 import { orderActions } from '../../../store/orderSlice'
-import ProductSelect from '../../ProductSelect'
-import LocationPicker from '../../LocationPicker'
+import ProductSelect from '../ProductSelect'
+import LocationPicker from '../LocationPicker'
+import { toast } from 'react-toastify'
 
 function UpdateOrderForm() {
   const accessToken = useSelector(state => state.auth.token)
@@ -60,6 +61,9 @@ function UpdateOrderForm() {
         o.id === newOrder.id ? newOrder : o
       )
       dispatch(orderActions.setOrders(updatedOrders))
+
+      toast.success('Замовлення змінено')
+
       navigate('/control-panel/order')
     } catch (error) {
       console.log(error)

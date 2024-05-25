@@ -1,4 +1,4 @@
-@import '../../variables.scss';
+@import '../../../variables.scss';
 
 li:has(#chat-link.active) {
   background-color: $primary-200;
