@@ -40,7 +40,18 @@ function Sidebar() {
           <li className={styles.list__item}>
             <NavLink
               activeclassname="active"
-              to={'/control-panel/request'}
+              to={'/control-panel/trader/request'}
+              className={styles.list__link}
+            >
+              <Truck /> Запити
+            </NavLink>
+          </li>
+        )}
+        {user && user.role === 'admin' && (
+          <li className={styles.list__item}>
+            <NavLink
+              activeclassname="active"
+              to={'/control-panel/admin/request'}
               className={styles.list__link}
             >
               <Truck /> Запити

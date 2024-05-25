@@ -4,10 +4,14 @@ const orderSlice = createSlice({
   name: 'order',
   initialState: {
     orders: null,
+    requests: null
   },
   reducers: {
     setOrders(state, action) {
       state.orders = action.payload
+    },
+    setRequests(state, action) {
+      state.requests = action.payload
     },
   },
 })

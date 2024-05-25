@@ -57,6 +57,7 @@ function UpdateOrderForm() {
       )
 
       const newOrder = response.data
+
       const updatedOrders = orders.map(o =>
         o.id === newOrder.id ? newOrder : o
       )
@@ -82,9 +83,6 @@ function UpdateOrderForm() {
 
   const handleLocationSelect = location => {
     if (location) {
-      // console.log(location);
-      // const { lat, lng } = location
-
       setDestination(location)
     }
   }

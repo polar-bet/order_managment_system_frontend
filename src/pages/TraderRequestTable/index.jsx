@@ -28,10 +28,9 @@ import axiosInstance from '../../api/axiosInstance'
 import CreateProductForm from '../../components/Product/Create'
 import { Edit } from '@mui/icons-material'
 import UpdateProductForm from '../../components/Product/Update'
-import { orderActions } from '../../store/orderSlice'
-import CreateOrderForm from '../../components/Order/Create'
-import UpdateOrderForm from '../../components/Order/Update'
 import { ToastContainer, toast } from 'react-toastify'
+import { orderActions } from '../../store/orderSlice'
+import { Button } from '@mui/material'
 
 function createData(id, status, product, destination, count, price) {
   return {
@@ -60,6 +59,10 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy)
 }
 
+// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
+// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
+// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
+// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index])
   stabilizedThis.sort((a, b) => {
@@ -127,8 +130,10 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
+        <TableCell
+        // padding="checkbox"
+        >
+          {/* <Checkbox
             color="primary"
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
@@ -136,7 +141,7 @@ function EnhancedTableHead(props) {
             inputProps={{
               'aria-label': 'select all desserts',
             }}
-          />
+          /> */}
         </TableCell>
         {headCells.map(headCell => (
           <TableCell
@@ -145,24 +150,18 @@ function EnhancedTableHead(props) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            {headCell.id !== 'action' ? (
-              <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={createSortHandler(headCell.id)}
-              >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc'
-                      ? 'sorted descending'
-                      : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            ) : (
-              headCell.label
-            )}
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>
+              ) : null}
+            </TableSortLabel>
           </TableCell>
         ))}
       </TableRow>
@@ -171,9 +170,9 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
+  // numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
+  // onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -212,7 +211,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Мої замовлення
+          Запити на замовлення
         </Typography>
       )}
 
@@ -234,18 +233,18 @@ function EnhancedTableToolbar(props) {
 }
 
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  // numSelected: PropTypes.number.isRequired,
+  // onDelete: PropTypes.func.isRequired,
 }
 
-export default function OrderTable() {
+export default function TraderRequestTable() {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('name')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
   const [rows, setRows] = React.useState([])
-  const orders = useSelector(state => state.order.orders)
+  const requests = useSelector(state => state.order.requests)
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -254,62 +253,6 @@ export default function OrderTable() {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
-  }
-
-  const handleDelete = async () => {
-    try {
-      await axiosInstance.delete('/order', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        data: {
-          orders: selected,
-        },
-      })
-
-      const updatedRows = rows.filter(row => !selected.includes(row.id))
-      setRows(updatedRows)
-      dispatch(orderActions.setOrders(updatedRows))
-      setSelected([])
-
-      const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
-
-      if (page >= totalPages && page > 0) {
-        setPage(page - 1)
-      }
-
-      toast.success('Товар видалено успішно')
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelected = rows.map(n => n.id)
-      setSelected(newSelected)
-      return
-    }
-    setSelected([])
-  }
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id)
-    let newSelected = []
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id)
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1))
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1))
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      )
-    }
-    setSelected(newSelected)
   }
 
   const handleChangePage = (event, newPage) => {
@@ -335,13 +278,9 @@ export default function OrderTable() {
     [order, orderBy, page, rowsPerPage, rows]
   )
 
-  const handleEditClick = (e, row) => {
-    navigate(`/control-panel/order/${row.id}`)
-  }
-
-  const fetchOrders = async () => {
+  const fetchRequests = async () => {
     try {
-      const response = await axiosInstance.get('order', {
+      const response = await axiosInstance.get('trader/order', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -358,41 +297,66 @@ export default function OrderTable() {
         )
       )
 
-      dispatch(orderActions.setOrders(orders))
+      dispatch(orderActions.setRequests(orders))
       setRows(orders)
     } catch (error) {
       console.error('Failed to fetch products:', error)
     }
   }
 
+  const handleApprove = async id => {
+    try {
+      const response = await axiosInstance.put(`/order/${id}/approve`, null, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      const updatedRequests = requests.map(item =>
+        item.id === id ? response.data : item
+      )
+
+      dispatch(orderActions.setRequests(updatedRequests))
+
+      toast.success('Запит затверджено')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const handleDecline = async id => {
+    try {
+      const response = await axiosInstance.put(`/order/${id}/decline`, null, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      const updatedRequests = requests.map(item =>
+        item.id === id ? response.data : item
+      )
+
+      dispatch(orderActions.setRequests(updatedRequests))
+
+      toast.success('Запит відхилено')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   React.useEffect(() => {
     if (accessToken) {
-      fetchOrders()
+      fetchRequests()
     }
   }, [accessToken])
 
   React.useEffect(() => {
-    if (orders) {
-      setRows(orders)
+    if (requests) {
+      setRows(requests)
     }
-  }, [orders])
+  }, [requests])
 
   return (
-    <Box sx={{ width: '100%' }} className={styles.container}>
-      <div className={styles.panel}>
-        <Link to={'/control-panel/order/create'} className={styles.panel__link}>
-          <PlusSquare className={styles.panel__icon} />
-          <span className={styles.panel__text}>Створити замовлення</span>
-        </Link>
-      </div>
-      <Routes>
-        <Route path="/create" element={<CreateOrderForm />} />
-        <Route path="/:id" element={<UpdateOrderForm />} />
-      </Routes>
+    <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selected.length}
-          onDelete={handleDelete}
+          // onDelete={handleDelete}
         />
         <TableContainer className={styles.tableContainer}>
           <Table
@@ -404,7 +368,7 @@ export default function OrderTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
+              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -415,22 +379,22 @@ export default function OrderTable() {
 
                 return (
                   <TableRow
-                    role="checkbox"
-                    aria-checked={isItemSelected}
+                    // role="checkbox"
+                    // aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: 'pointer' }}
+                    // selected={isItemSelected}
+                    // sx={{ cursor: 'pointer' }}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox
+                      {/* <Checkbox
                         onClick={event => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{
                           'aria-labelledby': labelId,
                         }}
-                      />
+                      /> */}
                     </TableCell>
                     <TableCell
                       component="th"
@@ -442,15 +406,30 @@ export default function OrderTable() {
                     </TableCell>
                     <TableCell align="right">{row.status.label}</TableCell>
                     <TableCell align="right">{`${row.destination.lat},${row.destination.lng}`}</TableCell>
-                    <TableCell align="right">{row.count}</TableCell>
+                    <TableCell align="right">{row.count.toFixed(2)}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
                     <TableCell align="right">
-                      <IconButton
-                        className={styles.action}
-                        onClick={e => handleEditClick(e, row)}
-                      >
-                        <Edit />
-                      </IconButton>
+                      <div className={styles.actions}>
+                        {row && row.status.name === 'sent' && (
+                          <>
+                            <Button
+                              variant="contained"
+                              onClick={() => handleApprove(row.id)}
+                              className={`${styles.button} ${styles.button__approve}`}
+                            >
+                              Схвалити
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              onClick={() => handleDecline(row.id)}
+                              className={`${styles.button} ${styles.button__delete}`}
+                            >
+                              Відхили
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 )

@@ -5,6 +5,7 @@ import {
   CashCoin,
   Envelope,
   PersonCircle,
+  PersonFillUp,
 } from 'react-bootstrap-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import axiosInstance from '../../api/axiosInstance'
@@ -68,7 +69,7 @@ function User() {
                   onClick={handleChangeAccount}
                   className={`${styles.button} ${styles.changeAccount}`}
                 >
-                  <CashCoin className={styles.button__icon} />
+                  <PersonFillUp className={styles.button__icon} />
                   <span className={styles.button__text}>
                     Змінити на аккаунт торговця
                   </span>

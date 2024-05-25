@@ -7,6 +7,7 @@ import Sidebar from '../../components/Sidebar'
 import ProductTable from '../../pages/ProductTable'
 import MyProductTable from '../../pages/MyProductTable'
 import ChatPage from '../../pages/ChatPage'
+import TraderRequestTable from '../../pages/TraderRequestTable'
 
 function ControlPanelLayout() {
   return (
@@ -18,6 +19,7 @@ function ControlPanelLayout() {
           <Route path="/order/*" element={<OrderTable />} />
           <Route path="/product" element={<ProductTable />} />
           <Route path="/my-product/*" element={<MyProductTable />} />
+          <Route path="/trader/request" element={<TraderRequestTable />} />
           <Route path="/chats/*" element={<ChatPage />} />
         </Routes>
       </div>
