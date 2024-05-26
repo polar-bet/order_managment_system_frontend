@@ -5,6 +5,7 @@ import OrderTable from '../../pages/OrderTable'
 import styles from './index.module.scss'
 import Sidebar from '../../components/Sidebar'
 import ProductTable from '../../pages/ProductTable'
+import UserTable from '../../pages/UserTable'
 import MyProductTable from '../../pages/MyProductTable'
 import TraderRequestTable from '../../pages/TraderRequestTable'
 import AdminRequestTable from '../../pages/AdminRequestTable'
@@ -34,6 +35,7 @@ function ControlPanelLayout() {
           </Route>
           <Route element={<AdminRoute />}>
             <Route path="/admin/request" element={<AdminRequestTable />} />
+            <Route path="/user" element={<UserTable />} />
           </Route>
         </Routes>
       </div>

@@ -142,9 +142,9 @@ function CreateProductForm() {
             <input
               type="number"
               required
-              min={1.0}
-              max={1000000.0}
-              step={0.1}
+              min={1}
+              max={1000000}
+              step={1}
               placeholder=""
               className={styles.form__input}
               onChange={e => setPrice(e.target.value)}

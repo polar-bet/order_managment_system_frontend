@@ -6,6 +6,7 @@ import {
   Cart2,
   CartPlus,
   ChatLeftText,
+  People,
   Truck,
 } from 'react-bootstrap-icons'
 import { NavLink } from 'react-router-dom'
@@ -50,15 +51,26 @@ function Sidebar() {
           </li>
         )}
         {user && user.role === 'admin' && (
-          <li className={styles.list__item}>
-            <NavLink
-              activeclassname="active"
-              to={'/control-panel/admin/request'}
-              className={styles.list__link}
-            >
-              <Truck /> Запити
-            </NavLink>
-          </li>
+          <>
+            <li className={styles.list__item}>
+              <NavLink
+                activeclassname="active"
+                to={'/control-panel/admin/request'}
+                className={styles.list__link}
+              >
+                <Truck /> Запити
+              </NavLink>
+            </li>
+            <li className={styles.list__item}>
+              <NavLink
+                activeclassname="active"
+                to={'/control-panel/user'}
+                className={styles.list__link}
+              >
+                <People /> Користувачі
+              </NavLink>
+            </li>
+          </>
         )}
         <li className={styles.list__item}>
           <NavLink

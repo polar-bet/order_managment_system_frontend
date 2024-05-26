@@ -13,33 +13,26 @@ import TableSortLabel from '@mui/material/TableSortLabel'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import Checkbox from '@mui/material/Checkbox'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { visuallyHidden } from '@mui/utils'
-import { Link, Route, Routes, useNavigate } from 'react-router-dom'
-import styles from './index.module.scss'
-import { PlusSquare } from 'react-bootstrap-icons'
 import { useDispatch, useSelector } from 'react-redux'
-import { productActions } from '../../store/productSlice'
+import { userActions } from '../../store/userSlice'
+import { roleActions } from '../../store/roleSlice'
 import axiosInstance from '../../api/axiosInstance'
-import CreateProductForm from '../../components/Product/Create'
-import { Edit } from '@mui/icons-material'
-import UpdateProductForm from '../../components/Product/Update'
 import { ToastContainer, toast } from 'react-toastify'
-import { orderActions } from '../../store/orderSlice'
 import { Button } from '@mui/material'
+import styles from './index.module.scss'
 
-function createData(id, status, product, destination, count, price) {
+function createData(id, name, email, role, created_at) {
   return {
     id,
-    product,
-    status,
-    destination,
-    count,
-    price,
+    name,
+    email,
+    role,
+    created_at
   }
 }
 
@@ -59,10 +52,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy)
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index])
   stabilizedThis.sort((a, b) => {
@@ -83,34 +72,28 @@ const headCells = [
     label: 'ID',
   },
   {
-    id: 'product',
+    id: 'name',
     numeric: true,
     disablePadding: true,
-    label: 'Назва товару',
+    label: "Ім'я",
   },
   {
-    id: 'status',
+    id: 'email',
     numeric: true,
     disablePadding: false,
-    label: 'Статус',
+    label: 'Електронна пошта',
   },
   {
-    id: 'destination',
+    id: 'role',
     numeric: true,
     disablePadding: false,
-    label: 'Пункт призначення',
+    label: 'Роль',
   },
   {
-    id: 'count',
+    id: 'created_at',
     numeric: true,
     disablePadding: false,
-    label: 'Кількість (шт)',
-  },
-  {
-    id: 'price',
-    numeric: true,
-    disablePadding: false,
-    label: 'Сума (грн)',
+    label: 'Дата створення',
   },
   {
     id: 'action',
@@ -121,14 +104,7 @@ const headCells = [
 ]
 
 function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props
+  const { order, orderBy, onRequestSort, rowCount } = props
   const createSortHandler = property => event => {
     onRequestSort(event, property)
   }
@@ -136,19 +112,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell
-        // padding="checkbox"
-        >
-          {/* <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all desserts',
-            }}
-          /> */}
-        </TableCell>
+        <TableCell />
         {headCells.map(headCell => (
           <TableCell
             key={headCell.id}
@@ -176,9 +140,7 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  // numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  // onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -217,7 +179,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Запити на замовлення
+          Користувачі
         </Typography>
       )}
 
@@ -239,21 +201,22 @@ function EnhancedTableToolbar(props) {
 }
 
 EnhancedTableToolbar.propTypes = {
-  // numSelected: PropTypes.number.isRequired,
-  // onDelete: PropTypes.func.isRequired,
+  numSelected: PropTypes.number.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
-export default function TraderRequestTable() {
+export default function UserTable() {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('name')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
   const [rows, setRows] = React.useState([])
-  const requests = useSelector(state => state.order.requests)
+  const users = useSelector(state => state.user.users)
+  const roles = useSelector(state => state.role.roles)
   const accessToken = useSelector(state => state.auth.token)
+  const [changedRole, setChangedRole] = React.useState([])
   const dispatch = useDispatch()
-  const navigate = useNavigate()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -284,62 +247,71 @@ export default function TraderRequestTable() {
     [order, orderBy, page, rowsPerPage, rows]
   )
 
-  const fetchRequests = async () => {
+  const fetchUsers = async () => {
     try {
-      const response = await axiosInstance.get('trader/order', {
+      const response = await axiosInstance.get('admin/user', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
 
-      const orders = response.data.map(order =>
-        createData(
-          order.id,
-          order.status,
-          order.product,
-          order.destination,
-          order.count,
-          order.price
-        )
+      const users = response.data.map(user =>
+        createData(user.id, user.name, user.email, user.role, user.created_at)
       )
 
-      dispatch(orderActions.setRequests(orders))
-      setRows(orders)
+      dispatch(userActions.setUsers(users))
+      setRows(users)
     } catch (error) {
-      console.error('Failed to fetch products:', error)
+      console.error('Failed to fetch users:', error)
     }
   }
 
-  const handleApprove = async id => {
+  const fetchRoles = async () => {
     try {
-      const response = await axiosInstance.put(`/order/${id}/approve`, null, {
+      const response = await axiosInstance.get('/role', {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
 
-      const updatedRequests = requests.map(item =>
-        item.id === id ? response.data : item
-      )
-
-      dispatch(orderActions.setRequests(updatedRequests))
-
-      toast.success('Запит затверджено')
+      dispatch(roleActions.setRoles(response.data))
     } catch (error) {
       console.log(error)
     }
   }
-  const handleDecline = async id => {
-    try {
-      const response = await axiosInstance.put(`/order/${id}/decline`, null, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
 
-      const updatedRequests = requests.map(item =>
-        item.id === id ? response.data : item
+  const handleRoleChange = (e, id) => {
+    const roleId = e.target.value
+
+    setChangedRole(prevChangedRole => {
+      const newChangedRole = prevChangedRole.filter(item => item.user_id !== id)
+      newChangedRole.push({ user_id: id, role_id: roleId })
+      return newChangedRole
+    })
+  }
+
+  const handleRoleUpdate = async id => {
+    const roleChange = changedRole.find(item => item.user_id === id)
+    if (!roleChange) return
+
+    try {
+      const response = await axiosInstance.put(
+        `/admin/user/${id}`,
+        {
+          role_id: roleChange.role_id,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
       )
 
-      dispatch(orderActions.setRequests(updatedRequests))
+      setChangedRole(changedRole.filter(item => item.user_id !== id))
 
-      toast.success('Запит відхилено')
+      const updatedUsers = users.map(item =>
+        item.id === id ? { ...item, role: response.data.role } : item
+      )
+
+      dispatch(userActions.setUsers(updatedUsers))
+
+      toast.success('Роль користувача змінена')
     } catch (error) {
       console.log(error)
     }
@@ -347,22 +319,17 @@ export default function TraderRequestTable() {
 
   React.useEffect(() => {
     if (accessToken) {
-      fetchRequests()
+      fetchUsers()
+      fetchRoles()
     }
   }, [accessToken])
-
-  React.useEffect(() => {
-    if (requests) {
-      setRows(requests)
-    }
-  }, [requests])
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selected.length}
-          // onDelete={handleDelete}
+          onDelete={() => {}}
         />
         <TableContainer className={styles.tableContainer}>
           <Table
@@ -374,34 +341,16 @@ export default function TraderRequestTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id)
                 const labelId = `enhanced-table-checkbox-${index}`
 
                 return (
-                  <TableRow
-                    // role="checkbox"
-                    // aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    // selected={isItemSelected}
-                    // sx={{ cursor: 'pointer' }}
-                  >
-                    <TableCell padding="checkbox">
-                      {/* <Checkbox
-                        onClick={event => handleClick(event, row.id)}
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                      /> */}
-                    </TableCell>
+                  <TableRow tabIndex={-1} key={row.id}>
+                    <TableCell padding="checkbox" />
                     <TableCell
                       component="th"
                       id={labelId}
@@ -410,33 +359,37 @@ export default function TraderRequestTable() {
                     >
                       {row.id}
                     </TableCell>
-                    <TableCell align="right">{row.product.name}</TableCell>
-                    <TableCell align="right">{row.status.label}</TableCell>
-                    <TableCell align="right">{`${row.destination.lat},${row.destination.lng}`}</TableCell>
-                    <TableCell align="right">{row.count}</TableCell>
-                    <TableCell align="right">{row.price}</TableCell>
+                    <TableCell align="right">{row.name}</TableCell>
+                    <TableCell align="right">{row.email}</TableCell>
                     <TableCell align="right">
-                      <div className={styles.actions}>
-                        {row && row.status.name === 'sent' && (
-                          <>
-                            <Button
-                              variant="contained"
-                              onClick={() => handleApprove(row.id)}
-                              className={`${styles.button} ${styles.button__approve}`}
+                      <select
+                        className={styles.roleSelect}
+                        onChange={e => handleRoleChange(e, row.id)}
+                      >
+                        {roles &&
+                          roles.map(role => (
+                            <option
+                              selected={role.name === row.role}
+                              key={role.id}
+                              value={role.id}
                             >
-                              Схвалити
-                            </Button>
-                            <Button
-                              variant="contained"
-                              color="error"
-                              onClick={() => handleDecline(row.id)}
-                              className={`${styles.button} ${styles.button__delete}`}
-                            >
-                              Відхили
-                            </Button>
-                          </>
-                        )}
-                      </div>
+                              {role.name}
+                            </option>
+                          ))}
+                      </select>
+                    </TableCell>
+                      <TableCell align="right">{row.created_at}</TableCell>
+                    <TableCell align="right">
+                      <Button
+                        variant="contained"
+                        onClick={() => handleRoleUpdate(row.id)}
+                        className={styles.button}
+                        disabled={
+                          !changedRole.find(item => item.user_id === row.id)
+                        }
+                      >
+                        Змінити роль
+                      </Button>
                     </TableCell>
                   </TableRow>
                 )

@@ -1,0 +1,19 @@
+@import '../../variables.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tableRowContainer {
+  display: flex;
+}
+
+.tableContainer {
+  max-height: 400px;
+}
+
+.button {
+  width: 100%;
+}

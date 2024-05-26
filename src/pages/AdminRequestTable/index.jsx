@@ -77,20 +77,26 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: 'product',
+    id: 'id',
     numeric: false,
+    disablePadding: true,
+    label: 'ID',
+  },
+  {
+    id: 'product',
+    numeric: true,
     disablePadding: true,
     label: 'Назва товару',
   },
   {
     id: 'status',
-    numeric: false,
+    numeric: true,
     disablePadding: false,
     label: 'Статус',
   },
   {
     id: 'destination',
-    numeric: false,
+    numeric: true,
     disablePadding: false,
     label: 'Пункт призначення',
   },
@@ -448,11 +454,12 @@ export default function AdminRequestTable() {
                       scope="row"
                       padding="none"
                     >
-                      {row.product.name}
+                      {row.id}
                     </TableCell>
+                    <TableCell align="right">{row.product.name}</TableCell>
                     <TableCell align="right">{row.status.label}</TableCell>
                     <TableCell align="right">{`${row.destination.lat},${row.destination.lng}`}</TableCell>
-                    <TableCell align="right">{row.count.toFixed(2)}</TableCell>
+                    <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
                     <TableCell align="right">
                       <div className={styles.actions}>

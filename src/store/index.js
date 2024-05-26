@@ -3,6 +3,8 @@ import authSlice from './authSlice'
 import chatSlice from './chatSlice'
 import productSlice from './productSlice'
 import orderSlice from './orderSlice'
+import userSlice from './userSlice'
+import roleSlice from './roleSlice'
 
 const store = configureStore({
   reducer: {
@@ -10,6 +12,8 @@ const store = configureStore({
     chat: chatSlice.reducer,
     product: productSlice.reducer,
     order: orderSlice.reducer,
+    user: userSlice.reducer,
+    role: roleSlice.reducer,
   },
 })
 
