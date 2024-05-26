@@ -75,6 +75,12 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
+    id: 'id',
+    numeric: false,
+    disablePadding: true,
+    label: 'ID',
+  },
+  {
     id: 'name',
     numeric: false,
     disablePadding: true,
@@ -248,6 +254,7 @@ export default function ProductTable() {
   const [rows, setRows] = React.useState([])
   const products = useSelector(state => state.product.products)
   const accessToken = useSelector(state => state.auth.token)
+  const user = useSelector(state => state.auth.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -361,7 +368,7 @@ export default function ProductTable() {
       )
 
       dispatch(productActions.setProducts(products))
-      setRows(products)
+      setRows(products.filter(p => p.seller.id === user.id))
     } catch (error) {
       console.error('Failed to fetch products:', error)
     }
@@ -443,10 +450,11 @@ export default function ProductTable() {
                       scope="row"
                       padding="none"
                     >
-                      {row.name}
+                      {row.id}
                     </TableCell>
+                    <TableCell align="right">{row.name}</TableCell>
                     <TableCell align="right">{row.category.name}</TableCell>
-                    <TableCell align="right">{row.seller}</TableCell>
+                    <TableCell align="right">{row.seller.name}</TableCell>
                     <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
                     <TableCell align="right">

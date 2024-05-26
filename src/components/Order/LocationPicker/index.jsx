@@ -40,7 +40,7 @@ function LocationSelector(props) {
 
 LocationSelector.propTypes = {
   onLocationSelect: PropTypes.func.isRequired,
-  initialPosition: PropTypes.array,
+  initialPosition: PropTypes.object,
 }
 
 function LocationPicker(props) {
@@ -67,8 +67,8 @@ function LocationPicker(props) {
 }
 
 LocationPicker.propTypes = {
-  initialPosition: PropTypes.array,
-  handleLocationSelect: PropTypes.func.isRequired,
+  initialPosition: PropTypes.object,
+  onLocationSelect: PropTypes.func.isRequired,
 }
 
 export default LocationPicker

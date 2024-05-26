@@ -13,65 +13,49 @@ import AuthUser from './components/AuthUser'
 import DetectUserStatus from './components/DetectUserStatus'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ControlPanelLayout from './layouts/ControlPanelLayout'
-
-const ProtectedRoute = ({ element, redirectTo, ...rest }) => {
-  const isAuthenticated = localStorage.getItem('accessToken')
-  // const isAuthenticated = useSelector(state => state.auth.token)
-  // const [isLoading, setLoading] = useState(true)
-
-  // setTimeout(() => {
-  //   setLoading(false)
-  // }, 400)
-
-  // if (!isLoading) {
-  return isAuthenticated ? (
-    element
-  ) : (
-    <Navigate
-      to={redirectTo}
-      state={{ from: rest.location?.pathname || '/' }}
-    />
-  )
-  // }
-}
-
-ProtectedRoute.propTypes = {
-  element: PropTypes.node.isRequired,
-  redirectTo: PropTypes.string.isRequired,
-}
+import GuestRoute from './components/ProtectedRoutes/GuestRoute'
+import AuthRoute from './components/ProtectedRoutes/AuthRoute'
 
 function App() {
+  // const user = useSelector(state => state.auth.token)
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 300)
+  }, [])
+
   return (
     <>
       <AuthUser />
       {/* <DetectUserStatus /> */}
-      <Header />
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route
-            path="/user-account"
-            element={
-              <ProtectedRoute element={<UserAccount />} redirectTo={'/login'} />
-            }
-          />
-          <Route
-            path="/control-panel/*"
-            element={
-              <ProtectedRoute
-                element={<ControlPanelLayout />}
-                redirectTo={'/login'}
-              />
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
+      {!isLoading && (
+        <>
+          <Header />
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route element={<GuestRoute />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+              </Route>
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route element={<AuthRoute />}>
+                <Route path="/user-account" element={<UserAccount />} />
+                <Route
+                  path="/control-panel/*"
+                  element={<ControlPanelLayout />}
+                />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </>
+      )}
       <Footer />
     </>
   )

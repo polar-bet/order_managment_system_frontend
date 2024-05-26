@@ -31,16 +31,18 @@ function Home() {
             </div>
             <div className={styles.infoContainer__linkContainer}>
               {user ? (
-                <Link
-                  to={'/control-panel/order'}
-                  className={styles.infoContainer__link}
-                >
-                  <div className={styles.infoContainer__linkText}>
-                    Перейти до замовлень
-                  </div>
-                </Link>
+                user.role !== 'admin' && (
+                  <Link
+                    to={'/control-panel/order'}
+                    className={styles.infoContainer__link}
+                  >
+                    <div className={styles.infoContainer__linkText}>
+                      Перейти до замовлень
+                    </div>
+                  </Link>
+                )
               ) : (
-                <Link to={'/auth'} className={styles.infoContainer__link}>
+                <Link to={'/login'} className={styles.infoContainer__link}>
                   <div className={styles.infoContainer__linkText}>
                     Почніть зараз
                   </div>

@@ -28,14 +28,16 @@ import axiosInstance from '../../api/axiosInstance'
 import CreateProductForm from '../../components/Product/Create'
 import { Edit } from '@mui/icons-material'
 import UpdateProductForm from '../../components/Product/Update'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
+import { orderActions } from '../../store/orderSlice'
+import { Button } from '@mui/material'
 
-function createData(id, name, category, seller, count, price) {
+function createData(id, status, product, destination, count, price) {
   return {
     id,
-    name,
-    category,
-    seller,
+    product,
+    status,
+    destination,
     count,
     price,
   }
@@ -75,28 +77,22 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: 'id',
+    id: 'product',
     numeric: false,
     disablePadding: true,
-    label: 'ID',
+    label: 'Назва товару',
   },
   {
-    id: 'name',
-    numeric: false,
-    disablePadding: true,
-    label: 'Назва',
-  },
-  {
-    id: 'category',
+    id: 'status',
     numeric: false,
     disablePadding: false,
-    label: 'Категорія',
+    label: 'Статус',
   },
   {
-    id: 'seller',
+    id: 'destination',
     numeric: false,
     disablePadding: false,
-    label: 'Продавець',
+    label: 'Пункт призначення',
   },
   {
     id: 'count',
@@ -108,7 +104,13 @@ const headCells = [
     id: 'price',
     numeric: true,
     disablePadding: false,
-    label: 'Ціна (грн / шт)',
+    label: 'Сума (грн)',
+  },
+  {
+    id: 'action',
+    numeric: false,
+    disablePadding: false,
+    label: 'дія',
   },
 ]
 
@@ -125,23 +127,21 @@ function EnhancedTableHead(props) {
     onRequestSort(event, property)
   }
 
-  const user = useSelector(state => state.auth.user)
-
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          {user && user.role === 'admin' && (
-            <Checkbox
-              color="primary"
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={rowCount > 0 && numSelected === rowCount}
-              onChange={onSelectAllClick}
-              inputProps={{
-                'aria-label': 'select all desserts',
-              }}
-            />
-          )}
+        <TableCell
+        // padding="checkbox"
+        >
+          {/* <Checkbox
+            color="primary"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all desserts',
+            }}
+          /> */}
         </TableCell>
         {headCells.map(headCell => (
           <TableCell
@@ -170,9 +170,9 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number,
+  // numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func,
+  // onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -211,7 +211,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Товари
+          Запити на замовлення
         </Typography>
       )}
 
@@ -233,20 +233,20 @@ function EnhancedTableToolbar(props) {
 }
 
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number,
-  onDelete: PropTypes.func,
+  // numSelected: PropTypes.number.isRequired,
+  // onDelete: PropTypes.func.isRequired,
 }
 
-export default function ProductTable() {
+export default function AdminRequestTable() {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('name')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
   const [rows, setRows] = React.useState([])
+  const requests = useSelector(state => state.order.requests)
   const products = useSelector(state => state.product.products)
   const accessToken = useSelector(state => state.auth.token)
-  const user = useSelector(state => state.auth.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -254,60 +254,6 @@ export default function ProductTable() {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
-  }
-
-  const handleDelete = async () => {
-    try {
-      await axiosInstance.delete('/admin/product', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        data: {
-          products: selected,
-        },
-      })
-
-      const updatedRows = rows.filter(row => !selected.includes(row.id))
-      dispatch(productActions.setProducts(updatedRows))
-      setRows(updatedRows)
-      setSelected([])
-
-      const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
-
-      if (page >= totalPages && page > 0) {
-        setPage(page - 1)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelected = rows.map(n => n.id)
-      setSelected(newSelected)
-      return
-    }
-    setSelected([])
-  }
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id)
-    let newSelected = []
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id)
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1))
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1))
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      )
-    }
-    setSelected(newSelected)
   }
 
   const handleChangePage = (event, newPage) => {
@@ -335,48 +281,128 @@ export default function ProductTable() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axiosInstance.get('/product', {
+      const response = await axiosInstance.get('product', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
 
-      const products = response.data.map(product =>
-        createData(
-          product.id,
-          product.name,
-          product.category,
-          product.seller,
-          product.count,
-          product.price
-        )
-      )
-
-      dispatch(productActions.setProducts(products))
-      setRows(products)
+      dispatch(productActions.setProducts(response.data))
     } catch (error) {
       console.error('Failed to fetch products:', error)
     }
   }
 
+  const fetchRequests = async () => {
+    try {
+      const response = await axiosInstance.get('admin/order', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      const orders = response.data.map(order =>
+        createData(
+          order.id,
+          order.status,
+          order.product,
+          order.destination,
+          order.count,
+          order.price
+        )
+      )
+
+      dispatch(orderActions.setRequests(orders))
+      setRows(orders)
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    }
+  }
+
+  const handleDelivered = async id => {
+    try {
+      const response = await axiosInstance.put(`/order/${id}/delivered`, null, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      const updatedRequests = requests.map(item =>
+        item.id === id ? response.data : item
+      )
+
+      dispatch(orderActions.setRequests(updatedRequests))
+
+      toast.success('Запит позначено як «доставлено»')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleExecute = async id => {
+    try {
+      const response = await axiosInstance.put(`/order/${id}/execute`, null, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      const updatedRequests = requests.map(item =>
+        item.id === id ? response.data.order : item
+      )
+
+      const updatedProducts = products.map(item => {
+        const product = response.data.product
+        return item.id === product.id ? product : item
+      })
+
+      console.log(updatedProducts)
+
+      dispatch(orderActions.setRequests(updatedRequests))
+      dispatch(productActions.setProducts(updatedProducts))
+
+      toast.success('Запит відправлено на виконання')
+    } catch (error) {
+      console.log(error)
+      const errorData = error.response.data
+      if (errorData) {
+        toast.error(errorData.message)
+      }
+    }
+  }
+  const handleDecline = async id => {
+    try {
+      const response = await axiosInstance.put(`/order/${id}/decline`, null, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      const updatedRequests = requests.map(item =>
+        item.id === id ? response.data : item
+      )
+
+      dispatch(orderActions.setRequests(updatedRequests))
+
+      toast.success('Запит відхилено')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   React.useEffect(() => {
     if (accessToken) {
+      fetchRequests()
       fetchProducts()
     }
   }, [accessToken])
 
   React.useEffect(() => {
-    if (products) {
-      setRows(products)
+    if (requests) {
+      setRows(requests)
     }
-  }, [products])
+  }, [requests])
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selected.length}
-          onDelete={handleDelete}
+          // onDelete={handleDelete}
         />
         <TableContainer className={styles.tableContainer}>
           <Table
@@ -388,7 +414,7 @@ export default function ProductTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
+              // onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -399,21 +425,22 @@ export default function ProductTable() {
 
                 return (
                   <TableRow
-                    role="checkbox"
-                    aria-checked={isItemSelected}
+                    // role="checkbox"
+                    // aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.id}
-                    selected={isItemSelected}
+                    // selected={isItemSelected}
+                    // sx={{ cursor: 'pointer' }}
                   >
                     <TableCell padding="checkbox">
-                      { user && user.role === 'admin' && <Checkbox
+                      {/* <Checkbox
                         onClick={event => handleClick(event, row.id)}
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{
                           'aria-labelledby': labelId,
                         }}
-                      /> }
+                      /> */}
                     </TableCell>
                     <TableCell
                       component="th"
@@ -421,13 +448,46 @@ export default function ProductTable() {
                       scope="row"
                       padding="none"
                     >
-                      {row.id}
+                      {row.product.name}
                     </TableCell>
-                    <TableCell align="right">{row.name}</TableCell>
-                    <TableCell align="right">{row.category.name}</TableCell>
-                    <TableCell align="right">{row.seller.name}</TableCell>
-                    <TableCell align="right">{row.count}</TableCell>
+                    <TableCell align="right">{row.status.label}</TableCell>
+                    <TableCell align="right">{`${row.destination.lat},${row.destination.lng}`}</TableCell>
+                    <TableCell align="right">{row.count.toFixed(2)}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
+                    <TableCell align="right">
+                      <div className={styles.actions}>
+                        {row && row.status.name === 'approved' && (
+                          <>
+                            <Button
+                              variant="contained"
+                              onClick={() => handleExecute(row.id)}
+                              className={`${styles.button} ${styles.button__approve}`}
+                            >
+                              Виконати
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              onClick={() => handleDecline(row.id)}
+                              className={`${styles.button} ${styles.button__delete}`}
+                            >
+                              Відхили
+                            </Button>
+                          </>
+                        )}
+                        {row && row.status.name === 'in_progress' && (
+                          <>
+                            <Button
+                              variant="contained"
+                              onClick={() => handleDelivered(row.id)}
+                              className={`${styles.button} ${styles.button__approve}`}
+                            >
+                              доставлено
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )
               })}

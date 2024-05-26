@@ -118,7 +118,7 @@ function UpdateOrderForm() {
             <input
               type="number"
               required
-              value={count}
+              value={count ?? ''}
               min={1}
               placeholder=""
               className={styles.form__input}

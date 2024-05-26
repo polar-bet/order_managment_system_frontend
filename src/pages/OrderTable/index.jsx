@@ -74,6 +74,12 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
+    id: 'id',
+    numeric: false,
+    disablePadding: true,
+    label: 'ID',
+  },
+  {
     id: 'product',
     numeric: false,
     disablePadding: true,
@@ -438,8 +444,9 @@ export default function OrderTable() {
                       scope="row"
                       padding="none"
                     >
-                      {row.product.name}
+                      {row.id}
                     </TableCell>
+                    <TableCell align="right">{row.product.name}</TableCell>
                     <TableCell align="right">{row.status.label}</TableCell>
                     <TableCell align="right">{`${row.destination.lat},${row.destination.lng}`}</TableCell>
                     <TableCell align="right">{row.count}</TableCell>

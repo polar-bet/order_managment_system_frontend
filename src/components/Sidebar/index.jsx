@@ -27,15 +27,17 @@ function Sidebar() {
             <BarChartLine /> Статистика
           </NavLink>
         </li>
-        <li className={styles.list__item}>
-          <NavLink
-            activeclassname="active"
-            to={'/control-panel/order'}
-            className={styles.list__link}
-          >
-            <Truck /> Замовлення
-          </NavLink>
-        </li>
+        {user && user.role !== 'admin' && (
+          <li className={styles.list__item}>
+            <NavLink
+              activeclassname="active"
+              to={'/control-panel/order'}
+              className={styles.list__link}
+            >
+              <Truck /> Замовлення
+            </NavLink>
+          </li>
+        )}
         {user && user.role === 'trader' && (
           <li className={styles.list__item}>
             <NavLink
@@ -78,15 +80,17 @@ function Sidebar() {
             </NavLink>
           </li>
         )}
-        <li className={styles.list__item}>
-          <NavLink
-            activeclassname="active"
-            to={'/control-panel/chats'}
-            className={styles.list__link}
-          >
-            <ChatLeftText /> Чати
-          </NavLink>
-        </li>
+        {user && user.role !== 'admin' && (
+          <li className={styles.list__item}>
+            <NavLink
+              activeclassname="active"
+              to={'/control-panel/chats'}
+              className={styles.list__link}
+            >
+              <ChatLeftText /> Чати
+            </NavLink>
+          </li>
+        )}
       </ul>
     </div>
   )
