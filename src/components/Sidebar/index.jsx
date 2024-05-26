@@ -7,6 +7,7 @@ import {
   CartPlus,
   ChatLeftText,
   People,
+  Tags,
   Truck,
 } from 'react-bootstrap-icons'
 import { NavLink } from 'react-router-dom'
@@ -68,6 +69,15 @@ function Sidebar() {
                 className={styles.list__link}
               >
                 <People /> Користувачі
+              </NavLink>
+            </li>
+            <li className={styles.list__item}>
+              <NavLink
+                activeclassname="active"
+                to={'/control-panel/category'}
+                className={styles.list__link}
+              >
+                <Tags /> Категорії
               </NavLink>
             </li>
           </>

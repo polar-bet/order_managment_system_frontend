@@ -13,26 +13,33 @@ import TableSortLabel from '@mui/material/TableSortLabel'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
+import Checkbox from '@mui/material/Checkbox'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { visuallyHidden } from '@mui/utils'
-import { useDispatch, useSelector } from 'react-redux'
-import { userActions } from '../../store/userSlice'
-import { roleActions } from '../../store/roleSlice'
-import axiosInstance from '../../api/axiosInstance'
-import { ToastContainer, toast } from 'react-toastify'
-import { Button } from '@mui/material'
+import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import styles from './index.module.scss'
+import { PlusSquare } from 'react-bootstrap-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { productActions } from '../../store/productSlice'
+import axiosInstance from '../../api/axiosInstance'
+import CreateProductForm from '../../components/Product/Create'
+import { Edit } from '@mui/icons-material'
+import UpdateProductForm from '../../components/Product/Update'
+import { orderActions } from '../../store/orderSlice'
+import CreateOrderForm from '../../components/Order/Create'
+import UpdateOrderForm from '../../components/Order/Update'
+import { ToastContainer, toast } from 'react-toastify'
+import CreateCategoryForm from '../../components/Category/Create'
+import UpdateCategoryForm from '../../components/Category/Update'
 
-function createData(id, name, email, role, created_at) {
+function createData(id, name, product_count) {
   return {
     id,
     name,
-    email,
-    role,
-    created_at,
+    product_count,
   }
 }
 
@@ -75,36 +82,31 @@ const headCells = [
     id: 'name',
     numeric: true,
     disablePadding: true,
-    label: "Ім'я",
+    label: 'Назва категорії',
   },
   {
-    id: 'email',
+    id: 'product_count',
     numeric: true,
-    disablePadding: false,
-    label: 'Електронна пошта',
-  },
-  {
-    id: 'role',
-    numeric: true,
-    disablePadding: false,
-    label: 'Роль',
-  },
-  {
-    id: 'created_at',
-    numeric: true,
-    disablePadding: false,
-    label: 'Дата створення',
+    disablePadding: true,
+    label: 'Кількість товарів',
   },
   {
     id: 'action',
-    numeric: false,
+    numeric: true,
     disablePadding: false,
     label: 'дія',
   },
 ]
 
 function EnhancedTableHead(props) {
-  const { order, orderBy, onRequestSort, rowCount } = props
+  const {
+    onSelectAllClick,
+    order,
+    orderBy,
+    numSelected,
+    rowCount,
+    onRequestSort,
+  } = props
   const createSortHandler = property => event => {
     onRequestSort(event, property)
   }
@@ -112,7 +114,17 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell />
+        <TableCell padding="checkbox">
+          <Checkbox
+            color="primary"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all desserts',
+            }}
+          />
+        </TableCell>
         {headCells.map(headCell => (
           <TableCell
             key={headCell.id}
@@ -120,18 +132,24 @@ function EnhancedTableHead(props) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+            {headCell.id !== 'action' ? (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : 'asc'}
+                onClick={createSortHandler(headCell.id)}
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === 'desc'
+                      ? 'sorted descending'
+                      : 'sorted ascending'}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            ) : (
+              headCell.label
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -140,7 +158,9 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
+  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
+  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
@@ -179,7 +199,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Користувачі
+          Категорії
         </Typography>
       )}
 
@@ -205,23 +225,78 @@ EnhancedTableToolbar.propTypes = {
   onDelete: PropTypes.func.isRequired,
 }
 
-export default function UserTable() {
+export default function CategoryTable() {
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('name')
   const [selected, setSelected] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
   const [rows, setRows] = React.useState([])
-  const users = useSelector(state => state.user.users)
-  const roles = useSelector(state => state.role.roles)
+  const categories = useSelector(state => state.product.categories)
   const accessToken = useSelector(state => state.auth.token)
-  const [changedRole, setChangedRole] = React.useState([])
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
+  }
+
+  const handleDelete = async () => {
+    try {
+      await axiosInstance.delete('/admin/category', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data: {
+          categories: selected,
+        },
+      })
+
+      const updatedRows = rows.filter(row => !selected.includes(row.id))
+      setRows(updatedRows)
+      dispatch(productActions.setCategories(updatedRows))
+      setSelected([])
+
+      const totalPages = Math.ceil(updatedRows.length / rowsPerPage)
+
+      if (page >= totalPages && page > 0) {
+        setPage(page - 1)
+      }
+
+      toast.success('Категорію видалено успішно')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSelectAllClick = event => {
+    if (event.target.checked) {
+      const newSelected = rows.map(n => n.id)
+      setSelected(newSelected)
+      return
+    }
+    setSelected([])
+  }
+
+  const handleClick = (event, id) => {
+    const selectedIndex = selected.indexOf(id)
+    let newSelected = []
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id)
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1))
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1))
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      )
+    }
+    setSelected(newSelected)
   }
 
   const handleChangePage = (event, newPage) => {
@@ -247,89 +322,61 @@ export default function UserTable() {
     [order, orderBy, page, rowsPerPage, rows]
   )
 
-  const fetchUsers = async () => {
+  const handleEditClick = (e, row) => {
+    navigate(`/control-panel/category/${row.id}`)
+  }
+
+  const fetchCategories = async () => {
     try {
-      const response = await axiosInstance.get('admin/user', {
+      const response = await axiosInstance.get('category', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
 
-      const users = response.data.map(user =>
-        createData(user.id, user.name, user.email, user.role, user.created_at)
+      const categories = response.data.map(category =>
+        createData(
+          category.id,
+          category.name,
+          category.product_count,
+        )
       )
 
-      dispatch(userActions.setUsers(users))
-      setRows(users)
+      dispatch(productActions.setCategories(categories))
+      setRows(categories)
     } catch (error) {
-      console.error('Failed to fetch users:', error)
-    }
-  }
-
-  const fetchRoles = async () => {
-    try {
-      const response = await axiosInstance.get('/role', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-
-      dispatch(roleActions.setRoles(response.data))
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleRoleChange = (e, id) => {
-    const roleId = e.target.value
-
-    setChangedRole(prevChangedRole => {
-      const newChangedRole = prevChangedRole.filter(item => item.user_id !== id)
-      newChangedRole.push({ user_id: id, role_id: roleId })
-      return newChangedRole
-    })
-  }
-
-  const handleRoleUpdate = async id => {
-    const roleChange = changedRole.find(item => item.user_id === id)
-    if (!roleChange) return
-
-    try {
-      const response = await axiosInstance.put(
-        `/admin/user/${id}`,
-        {
-          role_id: roleChange.role_id,
-        },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      )
-
-      setChangedRole(changedRole.filter(item => item.user_id !== id))
-
-      const updatedUsers = users.map(item =>
-        item.id === id ? { ...item, role: response.data.role } : item
-      )
-
-      dispatch(userActions.setUsers(updatedUsers))
-
-      toast.success('Роль користувача змінена')
-    } catch (error) {
-      console.log(error)
+      console.error('Failed to fetch products:', error)
     }
   }
 
   React.useEffect(() => {
     if (accessToken) {
-      fetchUsers()
-      fetchRoles()
+      fetchCategories()
     }
   }, [accessToken])
 
+  React.useEffect(() => {
+    if (categories) {
+      setRows(categories)
+    }
+  }, [categories])
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%' }} className={styles.container}>
+      <div className={styles.panel}>
+        <Link to={'/control-panel/category/create'} className={styles.panel__link}>
+          <PlusSquare className={styles.panel__icon} />
+          <span className={styles.panel__text}>Створити категорію</span>
+        </Link>
+      </div>
+      <Routes>
+        <Route path="/create" element={<CreateCategoryForm />} />
+        <Route path="/:id" element={<UpdateCategoryForm />} />
+      </Routes>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selected.length}
-          onDelete={() => {}}
+          onDelete={handleDelete}
         />
         <TableContainer className={styles.tableContainer}>
           <Table
@@ -341,16 +388,34 @@ export default function UserTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
+              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
+                const isItemSelected = isSelected(row.id)
                 const labelId = `enhanced-table-checkbox-${index}`
 
                 return (
-                  <TableRow tabIndex={-1} key={row.id}>
-                    <TableCell padding="checkbox" />
+                  <TableRow
+                    role="checkbox"
+                    aria-checked={isItemSelected}
+                    tabIndex={-1}
+                    key={row.id}
+                    selected={isItemSelected}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        onClick={event => handleClick(event, row.id)}
+                        color="primary"
+                        checked={isItemSelected}
+                        inputProps={{
+                          'aria-labelledby': labelId,
+                        }}
+                      />
+                    </TableCell>
                     <TableCell
                       component="th"
                       id={labelId}
@@ -360,39 +425,14 @@ export default function UserTable() {
                       {row.id}
                     </TableCell>
                     <TableCell align="right">{row.name}</TableCell>
-                    <TableCell align="right">{row.email}</TableCell>
+                    <TableCell align="right">{row.product_count}</TableCell>
                     <TableCell align="right">
-                      {roles && (
-                        <select
-                          defaultValue={
-                            roles.filter(r => r.name == row.role)[0].id
-                          }
-                          className={styles.roleSelect}
-                          onChange={e => handleRoleChange(e, row.id)}
-                        >
-                          {roles.map(role => (
-                            <option
-                              key={role.id}
-                              value={role.id}
-                            >
-                              {role.name}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </TableCell>
-                    <TableCell align="right">{row.created_at}</TableCell>
-                    <TableCell align="right">
-                      <Button
-                        variant="contained"
-                        onClick={() => handleRoleUpdate(row.id)}
-                        className={styles.button}
-                        disabled={
-                          !changedRole.find(item => item.user_id === row.id)
-                        }
+                      <IconButton
+                        className={styles.action}
+                        onClick={e => handleEditClick(e, row)}
                       >
-                        Змінити роль
-                      </Button>
+                        <Edit />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 )

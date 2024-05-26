@@ -1,0 +1,147 @@
+@import '../../../variables.scss';
+
+.container {
+  left: 0;
+  top: 0;
+  position: absolute;
+  background-color: rgba($color: #000000, $alpha: 0.5);
+  display: flex;
+  padding-top: 50px;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.title {
+  font-weight: 600;
+  color: $text-100;
+  font-size: 30px;
+}
+
+.form {
+  overflow-y: scroll;
+  height: 300px;
+  padding: 20px;
+  width: 500px;
+  background-color: $bg-300;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  gap: 30px;
+
+  &__label {
+    font-weight: 500;
+    pointer-events: none;
+    transition: 0.3s all ease-in-out;
+    position: absolute;
+    user-select: none;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &__group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__input {
+    width: 100%;
+    border: none;
+    padding-left: 5px;
+    background-color: $text-100;
+    height: 40px;
+  }
+
+  &__buttonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__buttonHolder {
+    background-color: $text-100;
+    border-radius: 5px;
+  }
+
+  &__button {
+    border-radius: 5px;
+    letter-spacing: 1px;
+    transition: 0.3s all ease-in-out;
+    background-color: $bg-200;
+    padding: 10px;
+    border: 2px solid $text-100;
+    color: $text-100;
+
+    &:hover {
+      background-color: $bg-100;
+    }
+  }
+
+  &__inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    position: relative;
+  }
+
+  &__errorList {
+  }
+
+  &__error {
+    color: $accent-100;
+    font-size: 12px;
+  }
+
+  .form__input:not(:placeholder-shown) ~ .form__label,
+  .form__input:focus ~ .form__label {
+    left: 0;
+    top: -25px;
+    font-size: 14px;
+    transform: translateY(0);
+    color: $text-100;
+  }
+
+  &__labelStatic {
+    color: $text-100;
+    font-weight: 500;
+  }
+}
+
+.exitButtonHolder {
+  display: flex;
+  justify-content: end;
+}
+
+.exitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: 0.2s all ease-in-out;
+  border-radius: 50%;
+  color: $text-100;
+
+  &:hover {
+    background-color: $primary-100;
+  }
+}
+
+.upperContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form__input:not(:placeholder-shown) ~ .form__label,
+.form__input:focus ~ .form__label {
+  left: 0;
+  top: -25px;
+  font-size: 14px;
+  transform: translateY(0);
+  color: $text-100;
+}

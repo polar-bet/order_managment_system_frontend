@@ -14,6 +14,7 @@ import ChatLayout from '../ChatLayout'
 import TraderRoute from '../../components/ProtectedRoutes/TraderRoute'
 import AdminRoute from '../../components/ProtectedRoutes/AdminRoute'
 import NotAdminRoute from '../../components/ProtectedRoutes/NotAdminRoute'
+import CategoryTable from '../../pages/CategoryTable'
 
 function ControlPanelLayout() {
   const user = useSelector(state => state.auth.user)
@@ -36,6 +37,7 @@ function ControlPanelLayout() {
           <Route element={<AdminRoute />}>
             <Route path="/admin/request" element={<AdminRequestTable />} />
             <Route path="/user" element={<UserTable />} />
+            <Route path="/category/*" element={<CategoryTable />} />
           </Route>
         </Routes>
       </div>
