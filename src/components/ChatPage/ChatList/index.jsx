@@ -16,13 +16,13 @@ function ChatList() {
             activeclassname="active"
             className={styles.list__link}
           >
-            <div
+            {/* <div
               className={`${styles.status}  ${
                 chat.interlocutor.is_online
                   ? styles.status_online
                   : styles.status_offline
               }`}
-            ></div>
+            ></div> */}
             <span className={styles.link__name}>{chat.interlocutor.name}</span>
           </NavLink>
         </li>

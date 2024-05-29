@@ -6,13 +6,15 @@ import axiosInstance from '../../api/axiosInstance'
 import ChatList from '../../components/ChatPage/ChatList'
 import Chat from '../../components/ChatPage/Chat'
 import { chatActions } from '../../store/chatSlice'
+import echo from '../../echo'
 
 function ChatLayout() {
   const chats = useSelector(state => state.chat.chats)
   const accessToken = useSelector(state => state.auth.token)
+  const user = useSelector(state => state.auth.user)
   const dispatch = useDispatch()
 
-  const getChats = async () => {
+  const fetchChats = async () => {
     try {
       const response = await axiosInstance.get('/chat', {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -25,7 +27,28 @@ function ChatLayout() {
   }
 
   useEffect(() => {
-    getChats()
+    if (user) {
+      echo
+        .channel(`user.${user.id}`)
+        .listen('.store_chat', e => {
+          fetchChats()
+        })
+        .listen('.delete_chat', e => {
+          fetchChats()
+        })
+        .listen('.store_message', e => {
+          console.log('it works');
+          fetchChats()
+        })
+    }
+
+    // return () => {
+    //   echo.leave(`user.${user.id}`)
+    // }
+  }, [])
+
+  useEffect(() => {
+    fetchChats()
   }, [accessToken])
 
   return (

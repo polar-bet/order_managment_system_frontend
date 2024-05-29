@@ -39,7 +39,7 @@ function Header() {
             to={'/control-panel'}
             className={styles.header__link}
           >
-            Мої замовлення
+            Панель керування
           </NavLink>
         )}
       </div>
@@ -84,7 +84,7 @@ function Header() {
                 to={'/control-panel'}
                 className={styles.burger__link}
               >
-                Мої замовлення
+                Панель керування
               </NavLink>
             )}
           </div>

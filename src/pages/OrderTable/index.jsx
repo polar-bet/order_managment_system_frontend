@@ -286,7 +286,7 @@ export default function OrderTable() {
 
       toast.success('Товар видалено успішно')
     } catch (error) {
-      console.log(error)
+      toast.error('Неможливо видалити замовлення, під час виконання')
     }
   }
 
@@ -452,12 +452,12 @@ export default function OrderTable() {
                     <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
                     <TableCell align="right">
-                      <IconButton
+                      {row.status.label === 'Відправлено' && <IconButton
                         className={styles.action}
                         onClick={e => handleEditClick(e, row)}
                       >
                         <Edit />
-                      </IconButton>
+                      </IconButton>}
                     </TableCell>
                   </TableRow>
                 )

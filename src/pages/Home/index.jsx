@@ -9,14 +9,6 @@ import { useSelector } from 'react-redux'
 function Home() {
   const user = useSelector(state => state.auth.user)
 
-  useEffect(() => {
-    if (user) {
-      window.Echo.private('chat.9').listen('MessageSent', e => {
-        console.log(e)
-      })
-    }
-  }, [])
-
   return (
     <div className={styles.container}>
       <div className={styles.holder}>

@@ -5,7 +5,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   background-color: $bg-100;
 }
 
@@ -15,35 +14,106 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: justify;
+  padding: 0 10px;
 }
 
 .upperPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: $bg-200;
   width: 100%;
-  padding: 10px;
+  padding: 10px 20px;
   color: $text-100;
 }
 
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: .2s all ease-in-out;
+  padding: 5px;
+  &__icon {
+    color: $text-100;
+  } 
+
+  &:hover {
+    background-color: $primary-200;
+  }
+}
+
 .messageContainer {
-  max-height: 500px;
-  &__messageHolder {
+  height: 100%;
+  &__messageList {
     padding: 10px;
     overflow-y: scroll;
     max-height: 450px;
     display: flex;
     flex-direction: column;
     gap: 5px;
+    height: 100%;
+    width: 100%;
+  }
+
+  &__messageHolder {
+    position: relative;
   }
 
   &__messageWrapper:has(.message_user) {
     display: flex;
     justify-content: right;
   }
+  
+  &__messageWrapper {
+    width: 100%;
+    // display: flex;
+    // flex-direction: column;
+  }
+  
+}
+
+.messageHolder {
+  position: relative;
+
+  &:hover {
+    .messageDeleteButtonContainer {
+      visibility: visible;
+    }
+  }
+}
+
+.messageDeleteButtonContainer {
+  padding-right: 10px;
+  position: absolute;
+  left: -30px;
+  height: 100%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  visibility: hidden;
+}
+
+.messageDeleteButton {
+  color: white;
+}
+
+.messageContent {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.date {
+  font-size: 8px;
 }
 
 .message {
   display: flex;
-  width: 50%;
+  word-break: break-all;
   padding: 10px;
   border-radius: 5px;
   

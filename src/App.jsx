@@ -17,9 +17,10 @@ import { useEffect, useState } from 'react'
 import ControlPanelLayout from './layouts/ControlPanelLayout'
 import GuestRoute from './components/ProtectedRoutes/GuestRoute'
 import AuthRoute from './components/ProtectedRoutes/AuthRoute'
+import ScrollToTop from './components/ScrollToTop'
 
 function App() {
-  // const user = useSelector(state => state.auth.token)
+  const user = useSelector(state => state.auth.token)
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -32,7 +33,8 @@ function App() {
   return (
     <>
       <AuthUser />
-      {/* <DetectUserStatus /> */}
+      <ScrollToTop />
+      {/* {user && <DetectUserStatus />} */}
       {!isLoading && (
         <>
           <Header />

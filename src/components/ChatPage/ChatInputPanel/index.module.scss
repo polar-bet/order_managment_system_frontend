@@ -1,1 +1,34 @@
 @import '../../../variables.scss';
+
+.container {
+  padding: 10px;
+  background-color: $bg-200;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.input {
+  width: 80%;
+  padding: 0 10px;
+}
+
+.sendButton {
+  background-color: $primary-200;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-100;
+  gap: 10px;
+
+  &:disabled {
+    background-color: $bg-300;
+    color: $text-200;
+  }
+
+  &__icon {
+    rotate: 45deg;
+  }
+}

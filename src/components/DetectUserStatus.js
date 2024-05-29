@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { chatActions } from '../store/chatSlice'
+import echo from '../echo'
+import Echo from 'laravel-echo'
 
 function DetectUserStatus() {
   const chats = useSelector(state => state.chat.chats)
@@ -9,11 +11,20 @@ function DetectUserStatus() {
 
   useEffect(() => {
     if (accessToken) {
-      window.Echo.join('user-status', null, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+      const echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        authEndpoint: `${import.meta.env.VITE_HOST_NAME}/broadcasting/auth`,
+        forceTLS: true,
+        auth: {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      }).here(users => {
+      })
+
+      echo.join('user-status').here(users => {
         if (chats) {
           users.forEach(user => {
             const chatsWithStatus = chats.map(
@@ -26,7 +37,7 @@ function DetectUserStatus() {
       })
 
       return () => {
-        window.Echo.leave('user-status')
+        echo.leave('user-status')
       }
     }
   }, [accessToken])

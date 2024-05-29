@@ -33,11 +33,31 @@ const OrderChart = () => {
     }
   }
 
+  const fetchTraderStats = async () => {
+    try {
+      const response = await axiosInstance.get('/trader/stats', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      setData(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    if (user && user.role === 'admin') {
-      fetchAdminStats()
-    } else {
-      fetchStats()
+    if (user) {
+      switch (user.role) {
+        case 'admin':
+          fetchAdminStats()
+          break
+        case 'trader':
+          fetchTraderStats()
+          break
+        case 'user':
+          fetchStats()
+          break
+      }
     }
   }, [user])
 
