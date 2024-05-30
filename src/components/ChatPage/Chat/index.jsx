@@ -23,24 +23,6 @@ function Chat() {
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    echo
-      .channel(`chat.${id}`)
-      .listen('.store_message', e => {
-        fetchChats()
-      })
-      .listen('.delete_message', e => {
-        fetchChats()
-      })
-      .listen('.delete_chat', e => {
-        fetchChats()
-      })
-
-    return () => {
-      echo.leave(`chat.${id}`)
-    }
-  }, [id])
-
   const fetchChats = async () => {
     try {
       const response = await axiosInstance.get('/chat', {

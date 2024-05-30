@@ -10,6 +10,16 @@ const chatSlice = createSlice({
     setChats(state, action) {
       state.chats = action.payload
     },
+    addChat(state, action) {
+      state.chats = state.chats
+        ? [...state.chats, action.payload]
+        : action.payload
+    },
+    deleteChat(state, action) {
+      state.chats = state.chats
+        ? state.chats.filter(c => c.id !== action.payload.id)
+        : []
+    },
     addMessage(state, action) {
       const message = action.payload
       const chatId = message.chat_id
