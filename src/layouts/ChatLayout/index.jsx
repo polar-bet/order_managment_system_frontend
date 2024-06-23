@@ -6,12 +6,13 @@ import axiosInstance from '../../api/axiosInstance'
 import ChatList from '../../components/ChatPage/ChatList'
 import Chat from '../../components/ChatPage/Chat'
 import { chatActions } from '../../store/chatSlice'
-import echo from '../../echo'
+import useEcho from '../../echo'
 
 function ChatLayout() {
   const chats = useSelector(state => state.chat.chats)
   const accessToken = useSelector(state => state.auth.token)
   const user = useSelector(state => state.auth.user)
+  const echo = useEcho()
   const dispatch = useDispatch()
 
   const fetchChats = async () => {

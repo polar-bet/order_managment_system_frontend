@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../api/axiosInstance'
 import { useDispatch } from 'react-redux'
 import { authActions } from '../../store/authSlice'
+import { login } from '../../services/authService'
 
 function Login() {
   const [email, setEmail] = useState(null)
@@ -16,16 +17,12 @@ function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const login = async e => {
+  const handleLogin = async e => {
     e.preventDefault()
 
     try {
-      let response = await axiosInstance.post('/login', {
-        email: email,
-        password: password,
-      })
-
-      dispatch(authActions.setToken(response.data))
+      let response = await login({ email, password })
+      dispatch(authActions.setToken(response))
       navigate('/')
     } catch (error) {
       let errors = error.response.data.errors
@@ -55,7 +52,7 @@ function Login() {
         </div>
         <div className={styles.formHolder}>
           <div className={styles.formContainer}>
-            <form className={styles.form} onSubmit={e => login(e)}>
+            <form className={styles.form} onSubmit={e => handleLogin(e)}>
               <h1 className={styles.form__title}>Вхід</h1>
               <div className={styles.form__group}>
                 <div className={styles.form__inputGroup}>

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../api/axiosInstance'
 import { useDispatch } from 'react-redux'
 import { authActions } from '../../store/authSlice'
+import { register } from '../../services/authService'
 
 function Register() {
   const [name, setName] = useState(null)
@@ -19,18 +20,19 @@ function Register() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const register = async e => {
+  const handleRegister = async e => {
     e.preventDefault()
 
     try {
-      let response = await axiosInstance.post('/register', {
-        name: name,
-        email: email,
-        password: password,
+      let response = await register({
+        name,
+        email,
+        password,
         password_confirmation: passwordConfirmation,
       })
 
-      dispatch(authActions.setToken(response.data))
+      dispatch(authActions.setToken(response))
+
       navigate('/')
     } catch (error) {
       let errors = error.response.data.errors
@@ -58,7 +60,7 @@ function Register() {
         </div>
         <div className={styles.formHolder}>
           <div className={styles.formContainer}>
-            <form className={styles.form} onSubmit={e => register(e)}>
+            <form className={styles.form} onSubmit={e => handleRegister(e)}>
               <h1 className={styles.form__title}>Реєстрація</h1>
               <div className={styles.form__group}>
                 <div className={styles.form__inputGroup}>

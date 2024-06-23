@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { chatActions } from '../store/chatSlice'
-import echo from '../echo'
+import useEcho from '../echo'
 
 function DetectUserStatus() {
   const dispatch = useDispatch()
   const user = useSelector(state => state.auth.user)
+  const echo = useEcho()
 
   const handleHere = users => {
     dispatch(chatActions.setActiveUsers(users))
