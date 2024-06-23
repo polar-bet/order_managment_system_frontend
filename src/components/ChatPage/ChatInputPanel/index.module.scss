@@ -9,7 +9,7 @@
 }
 
 .input {
-  width: 80%;
+  width: 100%;
   padding: 0 10px;
 }
 
@@ -30,5 +30,13 @@
 
   &__icon {
     rotate: 45deg;
+  }
+}
+
+@media (max-width: 750px) {
+  .sendButton {
+    &__text {
+      display: none;
+    }
   }
 }

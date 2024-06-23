@@ -5,8 +5,27 @@ const chatSlice = createSlice({
   initialState: {
     chats: null,
     messages: null,
+    isChatListOpened: true,
+    activeUsers: [],
   },
   reducers: {
+    openChatList(state) {
+      state.isChatListOpened = true
+    },
+    closeChatList(state) {
+      state.isChatListOpened = false
+    },
+    setActiveUsers(state, action) {
+      state.activeUsers = action.payload
+    },
+    addActiveUser(state, action) {
+      state.activeUsers = [...state.activeUsers, action.payload]
+    },
+    deleteActiveUser(state, action) {
+      state.activeUsers = state.activeUsers.filter(
+        user => user.id !== action.payload.id
+      )
+    },
     setChats(state, action) {
       state.chats = action.payload
     },
@@ -17,7 +36,7 @@ const chatSlice = createSlice({
     },
     deleteChat(state, action) {
       state.chats = state.chats
-        ? state.chats.filter(c => c.id !== action.payload.id)
+        ? state.chats.filter(chat => chat.id !== action.payload)
         : []
     },
     addMessage(state, action) {

@@ -20,7 +20,7 @@ import AuthRoute from './components/ProtectedRoutes/AuthRoute'
 import ScrollToTop from './components/ScrollToTop'
 
 function App() {
-  const user = useSelector(state => state.auth.token)
+  const user = useSelector(state => state.auth.user)
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -34,7 +34,7 @@ function App() {
     <>
       <AuthUser />
       <ScrollToTop />
-      {/* {user && <DetectUserStatus />} */}
+      <DetectUserStatus />
       {!isLoading && (
         <>
           <Header />

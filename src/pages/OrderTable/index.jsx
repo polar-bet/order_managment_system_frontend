@@ -32,6 +32,7 @@ import { orderActions } from '../../store/orderSlice'
 import CreateOrderForm from '../../components/Order/Create'
 import UpdateOrderForm from '../../components/Order/Update'
 import { ToastContainer, toast } from 'react-toastify'
+import echo from '../../echo'
 
 function createData(id, status, product, destination, count, price) {
   return {
@@ -251,6 +252,7 @@ export default function OrderTable() {
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(5)
   const [rows, setRows] = React.useState([])
+  const [isUserOnThisPage, setUserOnThisPage] = React.useState(false)
   const orders = useSelector(state => state.order.orders)
   const accessToken = useSelector(state => state.auth.token)
   const dispatch = useDispatch()
@@ -372,6 +374,14 @@ export default function OrderTable() {
   }
 
   React.useEffect(() => {
+    setUserOnThisPage(true)
+
+    return () => {
+      setUserOnThisPage(false)
+    }
+  }, [])
+
+  React.useEffect(() => {
     if (accessToken) {
       fetchOrders()
     }
@@ -382,6 +392,21 @@ export default function OrderTable() {
       setRows(orders)
     }
   }, [orders])
+
+  // React.useEffect(() => {
+  //   if (orders) {
+  //     orders.forEach(order => {
+  //       echo
+  //         .channel(`order.${order.id}`)
+  //         .listen('.order_status_change', data => {
+  //           dispatch(orderActions.replaceOrder(data))
+  //           toast.info(
+  //             `статус замовлення ${data.id} змінено на ${data.status.label}`
+  //           )
+  //         })
+  //     })
+  //   }
+  // }, [])
 
   return (
     <Box sx={{ width: '100%' }} className={styles.container}>
@@ -452,12 +477,14 @@ export default function OrderTable() {
                     <TableCell align="right">{row.count}</TableCell>
                     <TableCell align="right">{row.price}</TableCell>
                     <TableCell align="right">
-                      {row.status.label === 'Відправлено' && <IconButton
-                        className={styles.action}
-                        onClick={e => handleEditClick(e, row)}
-                      >
-                        <Edit />
-                      </IconButton>}
+                      {row.status.label === 'Відправлено' && (
+                        <IconButton
+                          className={styles.action}
+                          onClick={e => handleEditClick(e, row)}
+                        >
+                          <Edit />
+                        </IconButton>
+                      )}
                     </TableCell>
                   </TableRow>
                 )

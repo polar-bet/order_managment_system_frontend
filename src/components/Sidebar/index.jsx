@@ -6,6 +6,7 @@ import {
   Cart2,
   CartPlus,
   ChatLeftText,
+  EnvelopeArrowDown,
   People,
   Tags,
   Truck,
@@ -26,7 +27,8 @@ function Sidebar() {
             to={'/control-panel'}
             className={styles.list__link}
           >
-            <BarChartLine /> Статистика
+            <BarChartLine />{' '}
+            <span className={styles.list__linkText}>Статистика</span>
           </NavLink>
         </li>
         {user && user.role !== 'admin' && (
@@ -36,7 +38,8 @@ function Sidebar() {
               to={'/control-panel/order'}
               className={styles.list__link}
             >
-              <Truck /> Замовлення
+              <Truck />{' '}
+              <span className={styles.list__linkText}>Замовлення</span>
             </NavLink>
           </li>
         )}
@@ -47,7 +50,7 @@ function Sidebar() {
               to={'/control-panel/trader/request'}
               className={styles.list__link}
             >
-              <Truck /> Запити
+              <EnvelopeArrowDown /> <span className={styles.list__linkText}>Запити</span>
             </NavLink>
           </li>
         )}
@@ -59,7 +62,7 @@ function Sidebar() {
                 to={'/control-panel/admin/request'}
                 className={styles.list__link}
               >
-                <Truck /> Запити
+                <EnvelopeArrowDown /> <span className={styles.list__linkText}>Запити</span>
               </NavLink>
             </li>
             <li className={styles.list__item}>
@@ -68,7 +71,8 @@ function Sidebar() {
                 to={'/control-panel/user'}
                 className={styles.list__link}
               >
-                <People /> Користувачі
+                <People />{' '}
+                <span className={styles.list__linkText}>Користувачі</span>
               </NavLink>
             </li>
             <li className={styles.list__item}>
@@ -77,7 +81,8 @@ function Sidebar() {
                 to={'/control-panel/category'}
                 className={styles.list__link}
               >
-                <Tags /> Категорії
+                <Tags />{' '}
+                <span className={styles.list__linkText}>Категорії</span>
               </NavLink>
             </li>
           </>
@@ -88,7 +93,7 @@ function Sidebar() {
             to={'/control-panel/product'}
             className={styles.list__link}
           >
-            <Cart2 /> Товари
+            <Cart2 /> <span className={styles.list__linkText}>Товари</span>
           </NavLink>
         </li>
         {user && user.role === 'trader' && (
@@ -98,7 +103,8 @@ function Sidebar() {
               to={'/control-panel/my-product'}
               className={styles.list__link}
             >
-              <CartPlus /> Мої товари
+              <CartPlus />{' '}
+              <span className={styles.list__linkText}>Мої товари</span>
             </NavLink>
           </li>
         )}
@@ -109,7 +115,8 @@ function Sidebar() {
               to={'/control-panel/chats'}
               className={styles.list__link}
             >
-              <ChatLeftText /> Чати
+              <ChatLeftText />{' '}
+              <span className={styles.list__linkText}>Чати</span>
             </NavLink>
           </li>
         )}

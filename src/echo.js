@@ -36,6 +36,12 @@ const echo = new Echo({
   cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
   authEndpoint: `${import.meta.env.VITE_HOST_NAME}/broadcasting/auth`,
   forceTLS: true,
+  auth: {
+    headers: {
+      Accept: 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem('accessToken'), // Додайте токен авторизації
+    },
+  },
 })
 
 export default echo

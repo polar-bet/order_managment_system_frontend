@@ -1,5 +1,7 @@
 @import '../../../variables.scss';
 
-li:has(#chat-link.active) {
-  background-color: $primary-200;
+@media (min-width: 750px) {
+  li:has(#chat-link.active) {
+    background-color: $primary-200;
+  }
 }

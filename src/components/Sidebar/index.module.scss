@@ -26,3 +26,27 @@
     }
   }
 }
+
+@media (max-width: 650px) {
+  .container {
+    width: unset;
+  }
+  .list {
+    &__linkText {
+      display: none;
+    }
+
+  }
+}
+
+@media (max-width: 500px) {
+  .list {
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    &__link {
+      font-size: 30px;
+    }
+  }
+}

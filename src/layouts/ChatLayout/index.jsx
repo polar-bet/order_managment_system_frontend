@@ -27,37 +27,29 @@ function ChatLayout() {
   }
 
   useEffect(() => {
-    if (chats) {
-      chats.forEach(chat => {
-        echo
-          .channel(`chat.${chat.id}`)
-          .listen('.store_message', e => {
-            fetchChats()
-          })
-          .listen('.delete_message', e => {
-            fetchChats()
-          })
-          .listen('.delete_chat', e => {
-            fetchChats()
-          })
-      })
-
-      return () => {
-        chats.forEach(chat => {
-          echo.leave(`chat.${chat.id}`)
-        })
-      }
-    }
-  }, [chats])
-
-  useEffect(() => {
     if (user) {
-      echo.channel(`user.${user.id}`).listen('.store_chat', e => {
-        fetchChats()
-      })
+      echo
+        .private(`chat.${user.id}`)
+        .listen('.store_chat', chat => {
+          dispatch(chatActions.addChat(chat))
+        })
+        .listen('.store_message', message => {
+          dispatch(chatActions.addMessage(message))
+        })
+        .listen('.delete_message', message => {
+          dispatch(
+            chatActions.deleteMessage({
+              messageId: message.id,
+              chatId: message.chat_id,
+            })
+          )
+        })
+        .listen('.delete_chat', chat => {
+          dispatch(chatActions.deleteChat(chat.id))
+        })
 
       return () => {
-        echo.leave(`user.${user.id}`)
+        echo.leave(`chat.${user.id}`)
       }
     }
   }, [])

@@ -3,17 +3,18 @@ import styles from './index.module.scss'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ChatInputPanel from '../ChatInputPanel'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 import axiosInstance from '../../../api/axiosInstance'
 import { chatActions } from '../../../store/chatSlice'
 import { Delete } from '@mui/icons-material'
 import Pusher from 'pusher-js'
 import echo from '../../../echo'
+import { ArrowLeft } from 'react-bootstrap-icons'
 
 function Chat() {
   const { id } = useParams()
 
-  const chats = useSelector(state => state.chat.chats)
+  const { chats, isChatListOpened, activeUsers } = useSelector(state => state.chat)
 
   const chat = chats.find(chat => chat.id == id)
 
@@ -23,19 +24,19 @@ function Chat() {
 
   const dispatch = useDispatch()
 
-  const fetchChats = async () => {
-    try {
-      const response = await axiosInstance.get('/chat', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-
-      dispatch(chatActions.setChats(response.data))
-    } catch (error) {
-      console.log(error)
+  useEffect(() => {
+    dispatch(chatActions.closeChatList())
+    
+    if (!chat) {
+      dispatch(chatActions.openChatList())
     }
+  }, [chat])
+
+  const handleReturnButton = () => {
+    navigate('/control-panel/chats/')
   }
 
-  const handleDeleteButtonClick = async () => {
+  const handleDeleteChatButtonClick = async () => {
     try {
       await axiosInstance.delete(`/chat/${id}`, {
         headers: {
@@ -69,16 +70,35 @@ function Chat() {
   }
 
   return (
-    <div className={styles.container}>
+    <div
+      className={`${styles.container} ${
+        !isChatListOpened ? styles.container_opened : styles.container_closed
+      }`}
+    >
       {chat ? (
         <>
           <div className={styles.upperPanel}>
-            <span className={styles.upperPanel__interlocutorName}>
-              {chat.interlocutor.name}
-            </span>
+            <button
+              onClick={() => handleReturnButton()}
+              className={styles.returnButton}
+            >
+              <ArrowLeft className={styles.returnButton__icon} />
+            </button>
+            <div className={styles.upperPanel__interlocutorNameHolder}>
+              <span className={styles.upperPanel__interlocutorName}>
+                {chat.interlocutor.name}
+              </span>
+              <div
+                className={`${styles.status}  ${
+                  activeUsers.some(user => user.id === chat.interlocutor.id)
+                    ? styles.status_online
+                    : styles.status_offline
+                }`}
+              ></div>
+            </div>
             <button
               className={styles.deleteButton}
-              onClick={() => handleDeleteButtonClick()}
+              onClick={() => handleDeleteChatButtonClick()}
             >
               <Delete className={styles.deleteButton__icon} />
             </button>
